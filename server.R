@@ -2,7 +2,7 @@
 
 shinyServer(function(input, output, session) {
           
-          output$contents <- renderTable({
+          output$contents <- renderDataTable({
                     # input$file1 will be NULL initially. After the user selects
                     # and uploads a file, it will be a data frame with 'name',
                     # 'size', 'type', and 'datapath' columns. The 'datapath'

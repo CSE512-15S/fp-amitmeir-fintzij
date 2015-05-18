@@ -33,7 +33,7 @@ shinyUI(navbarPage("Exploratory binary classifier construction",
                                       ),
                             
                             mainPanel(
-                                      tableOutput('contents')
+                                      dataTableOutput('contents')
                                       )
                             
                             )
