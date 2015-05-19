@@ -1,6 +1,8 @@
 # server.R performs the server-side calculations for ui.R
 
 shinyServer(function(input, output, session) {
+  
+  source("basicViz.R")
           
           # reactive expression for the dataset
           inputData <- reactive({

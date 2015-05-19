@@ -1,5 +1,6 @@
 library(ggvis)
 library(ggplot2)
+library(pcf.kernesti)
 
 generateMainPlot <- function(xVar=NULL,xVarName="xVar",
                              yVar=NULL,yVarName="yVar",
@@ -66,10 +67,26 @@ facetX <- rbinom(length(yVar),1,0.5)
 facetY <- rbinom(length(yVar),1,0.5)
 response <- iris$Species=="virginica"
 
+
 generateMainPlot(xVar=xVar,xVarName="Sepal Width",
                  yVar=yVar,yVarName="Sepal Length",
                  response=response,responseName="Virginica",
                  numObs=nrow(iris),
-                 model=NULL,
+                 predict=predictions,
                  facetX=facetX,facetXName="randomX",
                  facetY=facetY,facetYName="randomY")
+
+model <- glm(response ~ iris[,1] + I(iris[,4]^2),family="binomial")
+predictions <- predict(model,type="response")
+
+predSmoother <- gam(predictions~s(xVar,yVar))
+grid <- expand.grid(x=seq(from=min(xVar)-0.1*sd(xVar),to=max(xVar)+0.1*sd(xVar),by=sd(xVar)*0.1),
+                    y=seq(from=min(yVar)-0.1*sd(yVar),to=max(yVar)+0.1*sd(yVar),by=sd(yVar)*0.1))
+smoothed.pred <- predict(predSmoother,newdata=data.frame(xVar=grid[,1],yVar=grid[,2]))
+
+ggplot() + geom_tile(aes(x=grid[,1],y=grid[,2],fill=as.vector(smoothed.pred))) + 
+  scale_fill_gradient2(midpoint=0.5,mid="white",high="blue",low="orange") +
+  geom_point(aes(x=xVar,y=yVar,color=response)) + theme_bw()
+
+  
+  
