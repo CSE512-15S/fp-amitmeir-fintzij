@@ -20,6 +20,14 @@ shinyServer(function(input, output, session) {
                     
           })
           
+          # dynamic variable names
+          observe({
+                    data<-inputData()
+                    updateSelectizeInput(session, 'vars', choices = names(data))
+                    
+          }) # end observe
+          
+
           # server function to render the data table          
           output$contents <- renderDataTable({
                     
@@ -33,12 +41,6 @@ shinyServer(function(input, output, session) {
                     summary(dataset)
           })
           
-          # dynamic variable names
-          observe({
-                    data<-inputData()
-                    updateSelectInput(session, 'x', choices = names(data))
-                    updateSelectInput(session, 'y', choices = names(data))
-                    
-          }) # end observe
+          
           
 })
