@@ -33,12 +33,15 @@ shinyUI(navbarPage("Exploratory binary classifier construction",
                                       ),
                             
                             mainPanel(
+                                      h3("Data summary"),
+                                      verbatimTextOutput("summary"),
+                                      hr(),
+                                      h3("Data"),
                                       dataTableOutput('contents')
                                       )
                             
                             )
                   ),
-         tabPanel("Data summary"),
          tabPanel("Explore data"),
          tabPanel("Classifier evaluation")          
 
