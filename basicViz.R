@@ -41,7 +41,7 @@ generateMainPlot <- function(xVar=NULL,xVarName="xVar",
     }
     
     dataset$variable <- variable
-    plot <- plot + geom_boxplot(aes(x=response,y=variable)) 
+    plot <- plot + geom_boxplot(aes(x=response,y=variable)) + xlab(variableName)
     
     #flip coordinates if x is null
     if(is.null(xVar)) {
@@ -50,7 +50,8 @@ generateMainPlot <- function(xVar=NULL,xVarName="xVar",
   
   #If both variables are not null plot scatter plot
   } else { 
-    plot <- plot + geom_point(aes(x=xVar,y=yVar,color=response))
+    plot <- plot + geom_point(aes(x=xVar,y=yVar,color=response)) 
+    plot <- plot + xlab(xVarName) + ylab(yVarName)
   }
   
   #Facet according to facetting variables 
@@ -65,8 +66,8 @@ facetX <- rbinom(length(yVar),1,0.5)
 facetY <- rbinom(length(yVar),1,0.5)
 response <- iris$Species=="virginica"
 
-generateMainPlot(xVar=xVar,xVarName="Sepal.Width",
-                 yVar=yVar,yVarName="Sepal.Length",
+generateMainPlot(xVar=xVar,xVarName="Sepal Width",
+                 yVar=yVar,yVarName="Sepal Length",
                  response=response,responseName="Virginica",
                  numObs=nrow(iris),
                  model=NULL,
