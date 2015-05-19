@@ -38,7 +38,8 @@ shinyUI(navbarPage("Exploratory binary classifier construction",
                             
                             )
                   ),
+         tabPanel("Data summary"),
          tabPanel("Explore data"),
-         tabPanel("Classifier performance")          
+         tabPanel("Classifier evaluation")          
 
           ))

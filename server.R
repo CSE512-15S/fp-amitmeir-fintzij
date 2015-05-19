@@ -2,7 +2,8 @@
 
 shinyServer(function(input, output, session) {
           
-          output$contents <- renderDataTable({
+          # reactive expression for the dataset
+          inputData <- reactive({
                     # input$file1 will be NULL initially. After the user selects
                     # and uploads a file, it will be a data frame with 'name',
                     # 'size', 'type', and 'datapath' columns. The 'datapath'
@@ -16,6 +17,23 @@ shinyServer(function(input, output, session) {
                     
                     read.csv(inFile$datapath, header = input$header,
                              sep = input$sep, quote = input$quote)
+                    
           })
+          
+          # server function to render the data table          
+          output$contents <- renderDataTable({
+                    
+                    inputData()
+                    
+          })
+          
+          
+          # dynamic variable names
+          observe({
+                    data<-theData()
+                    updateSelectInput(session, 'x', choices = names(data))
+                    updateSelectInput(session, 'y', choices = names(data))
+                    
+          }) # end observe
           
 })
