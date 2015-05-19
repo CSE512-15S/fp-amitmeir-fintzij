@@ -25,12 +25,17 @@ shinyServer(function(input, output, session) {
                     
                     inputData()
                     
-          })
+          }) 
           
+          # server function to render the data summary
+          output$summary <- renderPrint({
+                    dataset <- inputData()
+                    summary(dataset)
+          })
           
           # dynamic variable names
           observe({
-                    data<-theData()
+                    data<-inputData()
                     updateSelectInput(session, 'x', choices = names(data))
                     updateSelectInput(session, 'y', choices = names(data))
                     
