@@ -42,8 +42,24 @@ shinyUI(navbarPage("Exploratory binary classifier construction",
                             
                             )
                   ),
+<<<<<<< HEAD
          tabPanel("Explore data",
                   ),
+=======
+         tabPanel("Classifier construction",
+                  sidebarLayout(
+                            sidebarPanel(
+                                      selectizeInput(
+                                                "vars", 
+                                                "Select a response variable:", 
+                                                "")
+                                      ),
+                            
+                            mainPanel(
+                                      
+                                      )
+                            )),
+>>>>>>> origin/master
          tabPanel("Classifier evaluation")          
 
           ))
