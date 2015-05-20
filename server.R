@@ -23,7 +23,8 @@ shinyServer(function(input, output, session) {
           # dynamic variable names
           observe({
                     data<-inputData()
-                    updateSelectizeInput(session, 'vars', choices = names(data))
+                    updateSelectizeInput(session, 'predictorvars', choices = names(data))
+                    updateSelectizeInput(session, 'responsevars', choices = names(data))
                     
           }) # end observe
           

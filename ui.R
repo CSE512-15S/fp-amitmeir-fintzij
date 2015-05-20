@@ -45,10 +45,16 @@ shinyUI(navbarPage("Exploratory binary classifier construction",
          tabPanel("Classifier construction",
                   sidebarLayout(
                             sidebarPanel(
+                                      h3("Classifier parameters"),
                                       selectizeInput(
-                                                "vars", 
+                                                "predictorvars", 
                                                 "Select a response variable:", 
-                                                "")
+                                                ""),
+                                      selectizeInput(
+                                                "responsevars",
+                                                "Select predictor variables",
+                                                "", multiple = TRUE,
+                                                options = list(placeholder = "Select variables"))
                                       ),
                             
                             mainPanel(
