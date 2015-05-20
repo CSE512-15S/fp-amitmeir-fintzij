@@ -42,10 +42,6 @@ shinyUI(navbarPage("Exploratory binary classifier construction",
                             
                             )
                   ),
-<<<<<<< HEAD
-         tabPanel("Explore data",
-                  ),
-=======
          tabPanel("Classifier construction",
                   sidebarLayout(
                             sidebarPanel(
@@ -65,7 +61,6 @@ shinyUI(navbarPage("Exploratory binary classifier construction",
                                       
                                       )
                             )),
->>>>>>> origin/master
          tabPanel("Classifier evaluation")          
 
           ))
