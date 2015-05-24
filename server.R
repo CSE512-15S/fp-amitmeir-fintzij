@@ -7,7 +7,7 @@ shinyServer(function(input, output, session) {
     # and uploads a file, it will be a data frame with 'name',
     # 'size', 'type', and 'datapath' columns. The 'datapath'
     # column will contain the local filenames where the data can be found.
-    inFile <- input$file1
+    inFile <- input$dataset
 
     if (is.null(inFile))
 
@@ -18,13 +18,14 @@ shinyServer(function(input, output, session) {
   })
 
   # dynamic variable names
+  
   observe({
   
     data<-inputData()
 
     updateSelectizeInput(session, 'predictorvars', choices = names(data))
     
-    updateSelectizeInput(session, 'responsevars', choices = names(data))
+    updateSelectizeInput(session, 'responsevar', choices = names(data))
     
   }) # end observe
   
