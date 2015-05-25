@@ -29,6 +29,7 @@ shinyServer(function(input, output, session) {
     
   }) # end observe
   
+  
   # server function to render the data table          
 
   output$contents <- renderDataTable({
