@@ -19,15 +19,31 @@ shinyServer(function(input, output, session) {
 
   # dynamic variable names
   
-  observe({
+  output$variables <- renderUI({
+    
+    # get dataset
+    inFile <- inputData()
+    
+    # extract variable names
+    varnames <- names(inFile)
+    
+    # generate selectizeInputs
+    list(
+      selectizeInput("response", "Response Variable", choices = varnames),
+      selectizeInput("predictors", "Predictor Variables", choices = varnames, multiple = TRUE)
+      )
+    
+  })
   
-    data<-inputData()
-
-    updateSelectizeInput(session, 'predictorvars', choices = names(data))
-    
-    updateSelectizeInput(session, 'responsevar', choices = names(data))
-    
-  }) # end observe
+#   observe({
+#   
+#     data<-inputData()
+# 
+#     updateSelectizeInput(session, 'predictorvars', choices = names(data))
+#     
+#     updateSelectizeInput(session, 'responsevar', choices = names(data))
+#     
+#   }) # end observe
   
   
   # server function to render the data table          
