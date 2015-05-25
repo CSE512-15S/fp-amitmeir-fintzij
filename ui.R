@@ -48,19 +48,7 @@ shinyUI(navbarPage("Exploratory binary classifier construction",
                      uiOutput("variables"),
                      hr(),
                      h3("Classifier visualization"),
-                     selectizeInput(
-                       "var1vis",
-                       "Select first margin",
-                       ""
-                     ),
-                     selectizeInput(
-                       "var2vis",
-                       "Select second margin",
-                       ""),
-                     selectizeInput(
-                       "facetvar",
-                       "Select a facetting variable",
-                       "")
+                     uiOutput("vismargins")
                      ),
                    mainPanel(
                      )
