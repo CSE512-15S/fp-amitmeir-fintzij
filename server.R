@@ -123,12 +123,12 @@ shinyServer(function(input, output, session) {
   output$vismargins <- renderUI({
     
     # extract variable names
-    predic_vars <- isolate(input$predictors)
+    predic_vars <- input$predictors
     
     # generate selectizeInputs
     list(
       selectizeInput("var1vis", "Margin 1", choices = predic_vars),
-      selectizeInput("var2vis", "Margin 2", choices = predic_vars, multiple = TRUE)
+      selectizeInput("var2vis", "Margin 2", choices = predic_vars)
     )
     
   })

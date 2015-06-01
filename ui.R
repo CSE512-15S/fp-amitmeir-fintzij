@@ -44,10 +44,21 @@ shinyUI(navbarPage("Exploratory binary classifier construction",
         tabPanel("Classifier construction",
                  sidebarLayout(
                    sidebarPanel(
+                     h3("Select classifier"),
+                     selectizeInput("classifier", 
+                                    "", 
+                                    choices = list("Logistic regression" = "logit",
+                                                "Penalized logistic regression" = "pen_logit",
+                                                "Support vector machine" = "svm"))
+                     hr(),
+                     
                      h3("Classifier parameters"),
                      uiOutput("variables"),
+#                      uiOutput("tuning_params"),
+                     
                      hr(),
-                     h3("Classifier visualization"),
+                     
+                     h3("Visualization settings"),
                      uiOutput("vismargins")
                      ),
                    mainPanel(
