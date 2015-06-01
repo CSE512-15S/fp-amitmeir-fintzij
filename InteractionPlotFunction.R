@@ -89,6 +89,45 @@ mainEffectPlot <- function(allVariables,varsInModel,response,data,error=NULL) {
   }
   
   correlations$roundCor <- round(correlations$correlation,2)
+  
+  Blue = colorRampPalette(c("blue","grey"))
+  Red = colorRampPalette(c("grey","red"))
+  
+  # Negative values of defense get a blue color scale with 10 colors
+  correlations$def.color[correlations$roundCor<0] = 
+    as.character(cut(correlations$roundCor[correlations$roundCor<0], 
+                     seq(-1.1, 0, length.out=21), 
+                     labels=Blue(20)))
+  
+  # Positive values of defense get an orange color scale with 10 colors
+  correlations$def.color[correlations$roundCor>=0] = 
+    as.character(cut(correlations$roundCor[correlations$roundCor>=0], 
+                     seq(-0.1,1.1,length.out=21), 
+                     labels=Red(20)))
+  
+  #tooltip function
+  interactionToolTip <- function(x) {
+    if(is.null(x)) return(NULL)
+    row <- interactions[correlations$id == x$id, ]
+    paste(row$variable,": ",round(row$correlation,2),sep="")
+  }
+  
+  clickToolTip <- function(x) {
+    if(is.null(x)) return(NULL)
+    row <- interactions[correlations$id == x$id, ]
+    print(variable)
+    return(NULL)
+  }
+  
+  correlations$id <- 1:nrow(correlations)
+  
+  ggvisPlot <- ggvis(data=correlations,x=~variable,y=~correlation,fill:=~def.color,key:=~id) %>% 
+    layer_bars() %>%
+    add_tooltip(interactionToolTip, "hover") %>%
+    add_tooltip(clickToolTip,"click")
+  
+  return(ggvisPlot)
+  
 }
 
 fitGlmnetModel <- function(response,varsInModel,data,lambda=NULL) {
