@@ -24,6 +24,7 @@ shinyServer(function(input, output, session) {
 
   })
   
+  # code for mutually exclusive selection of predictors and response
   
   # server function to render the data table          
   
@@ -47,7 +48,7 @@ shinyServer(function(input, output, session) {
   
   # selectizeInput for variable selection UI 
   
-  output$variables <- renderUI({
+  output$response <- renderUI({
     
     # get dataset
     inFile <- inputData()
@@ -56,74 +57,122 @@ shinyServer(function(input, output, session) {
     varnames <- names(inFile)
     
     # generate selectizeInputs
-    list(
-      selectizeInput("response", "Response Variable", choices = varnames),
-      selectizeInput("predictors", "Predictor Variables", choices = varnames, multiple = TRUE)
-      )
+    selectizeInput("response", "Response Variable", choices = varnames)  
     
   })
   
   
-  # selection of identical predictor and response 
+  # update options for predictors based on selection of response 
   
-  # REACTIVE VALUES :
-  R <- reactiveValues(oldpredictors=0, oldresponse=0) 
-  # oldpredictors:  the previous value of predictors when Ex occurs
-  # oldresponse:  the previous value of response when Ey occurs
-  # REACTIVE VALUES :
-  XY <- reactiveValues(predictors=NULL,  response=NULL, count=0)
-  # predictors: the effective value of predictors
-  # response: the effective value of response
-  # count:  count each time predictors=response ('always 0' = 'app successful')
-  observe({
-    if(!is.null(XY$predictors) && !is.null(XY$response)) XY$count <- isolate(XY$count) + any(XY$predictors==XY$response)
-  })
-  output$count <- renderText({ XY$count })
-  ##
-  #
-  # the case of one of the predictors set to the same value as the reponse
-  #
-  observe({
-    if(!is.null(input$response)){
-      R$oldpredictors <- isolate(input$predictors)
-    }
-  })
-  observe({
-    if(!is.null(input$predictors)){
-      if(all(input$predictors!=isolate(input$response))){
-        R$oldpredictors <- input$predictors
-        XY$predictors <- input$predictors; XY$response <- isolate(input$response)
-      }
-      else{ # we exchange the matching predictor and response 
-        oldpredictors <- isolate(R$oldpredictors)
-        updateSelectInput(session, "response", choices=names(input$dataset), selected=oldpredictors)
-        XY$predictors <- input$predictors; XY$response <- oldpredictors 
-      }
-    }
-  })
-  ##
-  #
-  # 2) the case of the response being set to the same value as a predictor
-  #
-  observe({
-    if(!is.null(input$predictors)){
-      R$oldresponse <- isolate(input$response)
-    }
-  })
-  observe({
-    if(!is.null(input$response)){
-      if(all(input$response!=isolate(input$predictors))){
-        R$oldresponse <- input$response
-        XY$predictors <- isolate(input$predictors); XY$response <- input$response
-      }
-      else{  #  exchange predictors and response 
-        oldresponse <- isolate(R$oldresponse)
-        updateSelectInput(session, "predictors", choices=names(input$dataset), selected=oldresponse)
-        XY$predictors <- oldresponse; XY$response <- input$response
-      }
-    }
+  output$selectpreds <- renderPlot({
+            
+    response <- isolate(input$response)
+    
+    predopts <- names(inputData())
+    
+    predopts <- predopts[predopts != response]
+        
+    selectizeInput("selectpreds", "Select predictors", choices = predopts)
+    
   })
   
+  predictorVars <- reactive({
+    
+    response <- isolate(input$response)
+    
+    predopts <- names(inputData())
+    
+    predopts <- predopts[predopts != response]
+    
+    return(predopts)
+    
+  })
+
+  
+  variables <- reactiveValues(allVars = NULL,
+                              responseVar = NULL,
+                              predictorVars = NULL,
+                              varsInModel = NULL)
+  
+  observe({
+    variables$allVars <- names(inputData())
+    variables$responseVar <- input$response 
+    variables$predictorVars <- setdiff(isolate(variables$allVars), isolate(variables$responseVar))
+  })
+  
+  output$printresponse <- renderText({
+    
+    responsevar <- isolate(variables$responseVar)
+    
+    print(responsevar)
+    
+  })
+  
+
+#     # REACTIVE VALUES :
+#   R <- reactiveValues(oldpredictors=0, oldresponse=0) 
+# 
+#   # REACTIVE VALUES :
+#   XY <- reactiveValues(predictors=NULL,  response=NULL, count=0)
+# 
+#   observe({
+#     if(!is.null(XY$predictors) && !is.null(XY$response)) XY$count <- isolate(XY$count) + any(XY$predictors==XY$response)
+#   })
+#   output$count <- renderText({ XY$count })
+# 
+#   
+#   # the case of one of the predictors set to the same value as the reponse
+#   
+#   observe({
+#     if(!is.null(input$response)){
+#       R$oldpredictors <- isolate(input$predictors)
+#     }
+#   })
+#   observe({
+#     if(!is.null(input$predictors)){
+#       if(all(input$predictors!=isolate(input$response))){
+#         R$oldpredictors <- input$predictors
+#         XY$predictors <- input$predictors; XY$response <- isolate(input$response)
+#       }
+#       else{ # we exchange the matching predictor and response 
+#         oldpredictors <- isolate(R$oldpredictors)
+#         updateSelectInput(session, "response", choices=names(input$dataset), selected=oldpredictors)
+#         XY$predictors <- input$predictors; XY$response <- oldpredictors 
+#       }
+#     }
+#   })
+#   ##
+#   #
+#   # 2) the case of the response being set to the same value as a predictor
+#   #
+#   observe({
+#     if(!is.null(input$predictors)){
+#       R$oldresponse <- isolate(input$response)
+#     }
+#   })
+#   observe({
+#     if(!is.null(input$response)){
+#       if(all(input$response!=isolate(input$predictors))){
+#         R$oldresponse <- input$response
+#         XY$predictors <- isolate(input$predictors); XY$response <- input$response
+#       }
+#       else{  #  exchange predictors and response 
+#         oldresponse <- isolate(R$oldresponse)
+#         updateSelectInput(session, "predictors", choices=names(input$dataset), selected=oldresponse)
+#         XY$predictors <- oldresponse; XY$response <- input$response
+#       }
+#     }
+#   })
+#   
+#   output$maineffects <- renderPlot({
+#     
+#     inFile <- inputData()
+#     
+#     allVariables <- names(inFile)
+#     
+#     mainEffectPlot(allVariables,varsInModel,response,data,error=NULL)
+#     
+#   })
   
   
   # selectizeInput for plot margins
@@ -144,13 +193,10 @@ shinyServer(function(input, output, session) {
   ##
   # REACTIVE VALUES :
   S <- reactiveValues(oldvar1vis=0, oldvar2vis=0) 
-  # oldvar1vis:  the previous value of var1vis when Ex occurs
-  # oldvar2vis:  the previous value of var2vis when Ey occurs
+
   # REACTIVE VALUES :
   UV <- reactiveValues(var1vis=NULL,  var2vis=NULL, count=0)
-  # var1vis: the effective value of var1vis
-  # var2vis: the effective value of var2vis
-  # count:  count each time var1vis=var2vis ('always 0' = 'app successful')
+
   observe({
     if(!is.null(UV$var1vis) && !is.null(UV$var2vis)) UV$count <- isolate(UV$count) + any(UV$var1vis==UV$var2vis)
   })

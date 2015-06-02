@@ -30,7 +30,8 @@ shinyUI(navbarPage("Exploratory binary classifier construction",
                                            'Double Quote'='"',
                                            'Single Quote'="'"),
                                          '"'),
-                            tags$hr()
+                            tags$hr(),
+                            uiOutput("response")
                                       ),
                             
                             mainPanel(
@@ -58,6 +59,7 @@ shinyUI(navbarPage("Exploratory binary classifier construction",
                                          label = NULL, 
                                          choices = list("Logistic L1 regression" = "logit",
                                                         "Linear L1 regression" = "linear")),
+                          textOutput("printresponse"),
                           uiOutput("tuning_params")
                           ),
                    column(4,
