@@ -1,5 +1,5 @@
 interactionPlot <- function(varsInModel,data,error) {
-  if(length(varsInModel==0)) return(NULL)
+  if(length(varsInModel)==0) return(NULL)
   
   #Computing correlations with error
   varsInModel <- sort(varsInModel)
@@ -58,9 +58,9 @@ interactionPlot <- function(varsInModel,data,error) {
   
   ggvisPlot <- ggvis(data=interactions,x=~var1,y=~var2,fill:=~def.color,key:=~id) %>% 
     #layer_points() %>%
-    layer_rects(width=band(),height=band()) %>% 
+    layer_rects(width=band(),height=band(),fillOpacity:=0.8,fillOpacity.hover:=1) %>% 
     #layer_rects() %>% 
-    layer_text(text:=~errorCorRound2, stroke:="black",fill:="white", align:="left", baseline:="top",fontSize:=150/length(varsInModel)) %>%
+    layer_text(text:=~errorCorRound2, stroke:="black",fill:="white", align:="left", baseline:="top",fontSize:=100/length(varsInModel)) %>%
     scale_nominal("x", padding = 0, points = FALSE) %>% 
     scale_nominal("y", padding = 0, points = FALSE) %>%
     add_tooltip(interactionToolTip, "hover") %>%
@@ -74,7 +74,7 @@ mainEffectPlot <- function(allVariables,varsInModel,response,data,error=NULL) {
   nVars <- length(allVariables)
   correlations <- data.frame(variable=allVariables,correlation=nVars)
   for(i in 1:nVars) {
-    if(allVariables[i] %in% varsInModel) {
+    if(FALSE) { #if(allVariables[i] %in% varsInModel) {
       correlations$correlation[i] <- 1
       } else {
         commandComputeCor <- "with(data,cor("
@@ -92,6 +92,7 @@ mainEffectPlot <- function(allVariables,varsInModel,response,data,error=NULL) {
   
   Blue = colorRampPalette(c("blue","grey"))
   Red = colorRampPalette(c("grey","red"))
+  black = colorRampPalette("black")
   
   # Negative values of defense get a blue color scale with 10 colors
   correlations$def.color[correlations$roundCor<0] = 
@@ -105,32 +106,37 @@ mainEffectPlot <- function(allVariables,varsInModel,response,data,error=NULL) {
                      seq(-0.1,1.1,length.out=21), 
                      labels=Red(20)))
   
+  correlations$def.color[which(allVariables %in% varsInModel)] <- "#0000"
+  
   #tooltip function
   interactionToolTip <- function(x) {
     if(is.null(x)) return(NULL)
-    row <- interactions[correlations$id == x$id, ]
+    row <- correlations[correlations$id == x$id, ]
     paste(row$variable,": ",round(row$correlation,2),sep="")
   }
   
   clickToolTip <- function(x) {
     if(is.null(x)) return(NULL)
-    row <- interactions[correlations$id == x$id, ]
-    print(variable)
+    row <- correlations[correlations$id == x$id, ]
+    print(as.character(row$variable))
     return(NULL)
   }
   
   correlations$id <- 1:nrow(correlations)
+  correlations$zeros <- rep(0,nrow(correlations))
+  correlations$absCorrelation <- abs(correlations$correlation) 
   
-  ggvisPlot <- ggvis(data=correlations,x=~variable,y=~correlation,fill:=~def.color,key:=~id) %>% 
-    layer_bars() %>%
+  ggvisPlot <- ggvis(data=correlations,x=~variable,y=~absCorrelation,fill:=~def.color,key:=~id) %>% 
+    layer_points(size:=5000/length(allVariables),fillOpacity=0.75,fillOpacity.hover=1) %>%
+    #layer_rects(width=band()) %>%
     add_tooltip(interactionToolTip, "hover") %>%
-    add_tooltip(clickToolTip,"click")
-  
+    add_tooltip(clickToolTip,"click") %>%
+    layer_points(x:=0,y=1,opacity=0) #For setting axes limits
+
   return(ggvisPlot)
-  
 }
 
-fitGlmnetModel <- function(response,varsInModel,data,lambda=NULL) {
+fitGlmnetModel <- function(response,varsInModel,data,lambda=NULL,family="binomial") {
   if(is.null(varsInModel)) return(NULL)
     
   require(glmnet)
@@ -143,7 +149,7 @@ fitGlmnetModel <- function(response,varsInModel,data,lambda=NULL) {
   eval(parse(text=commandDesignMatrix))
   
   #Fitting Model 
-  commandFitModel <- paste("fit <- cv.glmnet(y=data$",response,",x=as.matrix(X),family='binomial')")
+  commandFitModel <- paste("fit <- cv.glmnet(y=data$",response,",x=as.matrix(X),family='",family,"')",sep="")
   eval(parse(text=commandFitModel))
   
   if(is.null(lambda)) {
