@@ -1,3 +1,5 @@
+require(pROC)
+
 interactionPlot <- function(varsInModel,data,error) {
   if(length(varsInModel)==0) return(NULL)
   
@@ -137,7 +139,15 @@ mainEffectPlot <- function(allVariables,varsInModel,response,data,error=NULL) {
 }
 
 fitGlmnetModel <- function(response,varsInModel,data,lambda=NULL,family="binomial") {
-  if(is.null(varsInModel)) return(NULL)
+  if(is.null(varsInModel)) {
+    commandFitIntercept <- paste("glm(",response,"~ 1,family=",family,",data=data)")
+    fit <- eval(parse(text=commandFitIntercept))
+    predictions <- predict(fit,type="response")
+    commandErrors <- paste("with(data,predictions-response)")
+    errors <- eval(parse(text=commandErrors))
+    lambda <- 0
+    return(list(fit=fit,prediction=predictions,error=errors,penalty=lambda))
+  }
     
   require(glmnet)
   #Generating design matrix
@@ -263,12 +273,23 @@ mainPlotFunction <- function(xVar=NULL,yVar=NULL,facetX=NULL,facetY=NULL,respons
   return(ggPlot)
 }
 
-# TEST
-# result <- fitGlmnetModel(response,varsInModel,data,lambda=NULL)
-# error <- result$error
-# interactionPlot(varsInModel,data,error)
-#
-# mainPlotFunction(xVar="Sepal.Length",yVar="Petal.Width",facetX=NULL,facetY=NULL,response="response",data,predictions)
+plotROC <- function(response,predictions,data) {
+  require(pROC)
+  commandROC <- paste("with(data,roc(",response,"~predictions))")
+  rocObject <- eval(parse(text=commandROC))
+  return(plot(smooth(rocObject),main=paste("Area Under the Curve:",rocObject$auc)))
+}
+
+plot(fit)
+
+# #TEST
+result <- fitGlmnetModel(response,varsInModel,data,lambda=NULL,family='binomial')
+fit <- result$fit
+error <- result$error
+predictions <- result$prediction
+interactionPlot(varsInModel,data,error)
+mainEffectPlot(allVariables,varsInModel,response,data,error=error) 
+mainPlotFunction(xVar="Sepal.Length",yVar="Petal.Width",facetX=NULL,facetY=NULL,response="response",data,predictions)
 
 
 
