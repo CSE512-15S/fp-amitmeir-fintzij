@@ -160,7 +160,75 @@ fitGlmnetModel <- function(response,varsInModel,data,lambda=NULL,family="binomia
   
   commandComputeError <- paste("error <- prediction-data$",response)
   eval(parse(text=commandComputeError))
-  return(list(fit=fit,prediction=prediction,error=error))
+  return(list(fit=fit,prediction=prediction,error=error,penalty=fit$lambda))
+}
+
+mainPlotFunction <- function(xVar=NULL,yVar=NULL,facetX=NULL,facetY=NULL,response=NULL,data,predictions) {
+  #Constructing data set for the plot
+  tempData <- data[,which(names(data) %in% c(xVar,yVar,facetX,facetY,response))]
+  tempData <- data.frame(tempData,predictions)
+  
+  #Temporary faceting variables for testing
+  ###############
+  tempData <- data.frame(tempData,xfac=rbinom(nrow(data),1,0.5),yfac=rbinom(nrow(data),1,0.5))
+  ################
+  
+  #return null if no variables are selected
+  if(all(is.null(c(xVar,yVar)))) return(NULL)
+  
+  #If only one variable is selected then return a boxplot
+  if(sum(is.null(c(xVar,yVar)))==1) {
+    variable <- ifelse(!is.null(xVar),xVar,yVar)
+    commandPlot <- paste("ggplot(data=tempData,aes(x=",response,",y=",variable,"))")
+    commandPlot <- paste(commandPlot,"+geom_boxplot()")
+    commandPlot <- paste(commandPlot,"+facet_grid(",facetY,"~",facetX,",labeller=label_both)")
+    commandPlot <- paste(commandPlot,"+theme_bw()")
+    if(is.null(xVar)) commandPlot <- paste(commandPlot,"+coord_flip()")
+    ggPlot <- eval(parse(text=commandPlot))
+    return(ggPlot)
+  }
+  
+  #If both variables are supplied
+  ## Add dummy faceting variables for streamlining
+  if(is.null(facetX)) {
+    tempData$xfacet <- rep("",nrow(tempData))
+    facetX <- "xfacet"
+  }
+  
+  if(is.null(facetY)) {
+    tempData$yfacet <- rep("",nrow(tempData))
+    facetY <- "yfacet"
+  }
+  
+  #A function for smoothing the predictions over the domain of the variables
+  #Computing the ranges on which smoothing must be done
+  commandXRange <- paste("with(tempData,c(min(",xVar,"),max(",xVar,")) + sd(",xVar,")*0.1*c(-1,1))")
+  xRange <- eval(parse(text=commandXRange))
+  commandYRange <- paste("with(tempData,c(min(",yVar,"),max(",yVar,")) + sd(",yVar,")*0.1*c(-1,1))")
+  yRange <- eval(parse(text=commandYRange))
+  
+  #smoothPrediction <- function(subset,xVar,yVar,facetX,facetY,xRange,yRange) {
+  subset <- tempData
+    #Fitting smoother to predictions
+    commandSmoothFit <- paste("gam(predictions~lo(",xVar,",",yVar,"),data=subset)")
+    smoothFit <- eval(parse(text=commandSmoothFit))
+    #If negative residuals than the model needs to be refit as an additive model
+    if(smoothFit$df.residual<0) {
+      commandSmoothFit <- paste("gam(predictions~s(",xVar,")+s(",yVar,"),data=subset)")
+      smoothFit <- eval(parse(text=commandSmoothFit))
+    }
+    
+    #Setting up "new data"
+    grid <- expand.grid(x=seq(from=xRange[1],to=xRange[2],length.out=150),
+                        y=seq(from=yRange[1],to=yRange[2],length.out=150))
+    names(grid) <- c(xVar,yVar)
+    grid <- data.frame(grid)
+    pred <- predict.gam(smoothFit,newdata=grid,type="response")
+    pred <- pmin(pmax(pred,0),1)
+    grid <- data.frame()
+    
+  }
+  
 }
 
 # TEST
