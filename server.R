@@ -1,8 +1,8 @@
 # server.R performs the server-side calculations for ui.R
 
-source("InteractionPlotFunction.R")
-source("basicViz.R")
-source("basicVizGGVIS.R")
+# source("InteractionPlotFunction.R")
+# source("basicViz.R")
+# source("basicVizGGVIS.R")
 library(glmnet)
 library(ggvis)
 
@@ -16,7 +16,7 @@ shinyServer(function(input, output, session) {
     # column will contain the local filenames where the data can be found.
     inFile <- input$dataset
 
-    if (is.null(inFile))
+    if(is.null(inFile))
 
     return(iris)
 
@@ -200,5 +200,7 @@ shinyServer(function(input, output, session) {
     }
   })
   
-  
+#   output$maineffects <- renderPlot({
+#     
+#   })
 })

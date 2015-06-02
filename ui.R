@@ -43,27 +43,49 @@ shinyUI(navbarPage("Exploratory binary classifier construction",
                )
              ),
         tabPanel("Classifier construction",
-                 sidebarLayout(
-                   sidebarPanel(
-                     h3("Select classifier"),
-                     selectizeInput("classifier", 
-                                    "", 
-                                    choices = list("Logistic regression" = "logit",
-                                                "Penalized logistic regression" = "pen_logit",
-                                                "Support vector machine" = "svm")),
-                     hr(),
-                     
-                     h3("Classifier parameters"),
-                     uiOutput("variables"),
+                 fluidRow(
+                   column(6,
+                          h3("Variable selection")),
+                   column(6,
+                          h3("Boundary visualization"))
+                   ),
+                 hr(),
+                 fluidRow(
+                   column(4,
+                          offset = 1,
+                          h4("Select classifier"),
+                          selectizeInput("classifier", 
+                                         label = NULL, 
+                                         choices = list("Logistic L1 regression" = "logit",
+                                                        "Linear L1 regression" = "linear")),
+                          uiOutput("tuning_params")
+                          ),
+                   column(4,
+                          offset=2,
+                          h4("Visualization settings"))
+                   )
+                 ),
+#         tabPanel("Classifier construction",
+#                  sidebarLayout(
+#                    sidebarPanel(
+#                      h3("Select classifier"),
+#                      selectizeInput("classifier", 
+#                                     "", 
+#                                     choices = list("Logistic regression" = "logit",
+#                                                 "Penalized logistic regression" = "pen_logit")),
+# #                      hr(),
+# #                      
+# #                      h3("Classifier parameters"),
+# #                      uiOutput("variables"),
 #                      uiOutput("tuning_params"),
-                     
-                     hr(),
-                     
-                     h3("Visualization settings"),
-                     uiOutput("vismargins")
-                     ),
-                   mainPanel(
-                     )
-                   )),
-        tabPanel("Classifier performance")   
+#                      
+#                      hr(),
+#                      
+#                      h3("Visualization settings"),
+#                      uiOutput("vismargins")
+#                      ),
+#                    mainPanel(
+#                      )
+#                    )),
+        tabPanel("Classifier performance")
         ))
