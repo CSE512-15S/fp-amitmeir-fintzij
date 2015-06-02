@@ -166,7 +166,8 @@ fitGlmnetModel <- function(response,varsInModel,data,lambda=NULL,family="binomia
 mainPlotFunction <- function(xVar=NULL,yVar=NULL,facetX=NULL,facetY=NULL,response=NULL,data,predictions) {
   #Constructing data set for the plot
   tempData <- data[,which(names(data) %in% c(xVar,yVar,facetX,facetY,response))]
-  tempData <- data.frame(tempData,predictions)
+  tempData <- cbind(tempData,predictions=predictions)
+  names(tempData)[ncol(tempData)] <- "predictions"
   
   #Temporary faceting variables for testing
   ###############
@@ -207,9 +208,10 @@ mainPlotFunction <- function(xVar=NULL,yVar=NULL,facetX=NULL,facetY=NULL,respons
   commandYRange <- paste("with(tempData,c(min(",yVar,"),max(",yVar,")) + sd(",yVar,")*0.1*c(-1,1))")
   yRange <- eval(parse(text=commandYRange))
   
-  #smoothPrediction <- function(subset,xVar,yVar,facetX,facetY,xRange,yRange) {
-  subset <- tempData
+  #The facetting function
+  smoothPrediction <- function(rowIndices,data,xVar,yVar,facetX,facetY,xRange,yRange) {
     #Fitting smoother to predictions
+    subset <- data[rowIndices,]
     commandSmoothFit <- paste("gam(predictions~lo(",xVar,",",yVar,"),data=subset)")
     smoothFit <- eval(parse(text=commandSmoothFit))
     #If negative residuals than the model needs to be refit as an additive model
@@ -219,16 +221,41 @@ mainPlotFunction <- function(xVar=NULL,yVar=NULL,facetX=NULL,facetY=NULL,respons
     }
     
     #Setting up "new data"
-    grid <- expand.grid(x=seq(from=xRange[1],to=xRange[2],length.out=150),
-                        y=seq(from=yRange[1],to=yRange[2],length.out=150))
+    grid <- expand.grid(x=seq(from=xRange[1],to=xRange[2],length.out=20),
+                        y=seq(from=yRange[1],to=yRange[2],length.out=20))
     names(grid) <- c(xVar,yVar)
     grid <- data.frame(grid)
     pred <- predict.gam(smoothFit,newdata=grid,type="response")
     pred <- pmin(pmax(pred,0),1)
-    grid <- data.frame()
-    
+    commandConstructGrid <- paste("data.frame(grid,predictions=pred,",
+                                  response,"=rep(NA,nrow(grid)),",
+                                  facetX,"=rep(subset$",facetX,"[1],nrow(grid)),",
+                                  facetY,"=rep(subset$",facetY,"[1],nrow(grid)))")
+    grid <- eval(parse(text=commandConstructGrid))
+    return(grid)
   }
   
+  #Computing the predictions according to facets
+  commandSmoothedPredictions <- paste("tapply(1:nrow(tempData),INDEX=list(tempData$",
+                                      facetX,",tempData$",facetY,
+                                      "),smoothPrediction,data=tempData,",
+                                      "xVar,yVar,facetX,facetY,xRange,yRange,simplify=FALSE)")
+  predictionFacets <- eval(parse(text=commandSmoothedPredictions))
+  #Joining with temporary data set
+  predictionFacets <- do.call("rbind",lapply(predictionFacets,function(x) x))
+  #tempData$predictions <- rep(NA,nrow(tempData))
+  #tempData <- rbind(tempData,predictionFacets)
+  
+  #Plotting
+  commandPlot <- paste("ggplot()")
+  commandPlot <- paste(commandPlot,"+ geom_tile(data=predictionFacets,aes(x=",xVar,",y=",yVar,",fill=predictions),alpha=0.3)")
+  commandPlot <- paste(commandPlot,"+ geom_point(data=tempData,aes(x=,",xVar,",y=",yVar,",color=",response,"))")
+  commandPlot <- paste(commandPlot,"+ facet_grid(",facetX,"~",facetY,",labeller='label_both')")
+  commandPlot <- paste(commandPlot,"+scale_fill_gradient2(midpoint=0.5,mid='white',high='blue',low='red')")
+  commandPlot <- paste(commandPlot,"+scale_color_manual(values=c('red3','navy'))")
+  ggPlot <- eval(parse(text=commandPlot))
+  
+  return(ggPlot)
 }
 
 # TEST
