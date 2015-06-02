@@ -1,6 +1,5 @@
 library(ggvis)
 library(ggplot2)
-library(pcf.kernesti)
 
 generateMainPlot <- function(xVar=NULL,xVarName="xVar",
                              yVar=NULL,yVarName="yVar",

@@ -1,4 +1,11 @@
 # server.R performs the server-side calculations for ui.R
+
+source("InteractionPlotFunction.R")
+source("basicViz.R")
+source("basicVizGGVIS.R")
+library(glmnet)
+library(ggvis)
+
 shinyServer(function(input, output, session) { 
   # reactive expression for the dataset
   

@@ -1,6 +1,7 @@
 # ui.R - User interface for the data exploration and classifier construction tool
 
 library(ggvis)
+library(glmnet)
 library(magrittr)
 
 shinyUI(navbarPage("Exploratory binary classifier construction",
@@ -49,7 +50,7 @@ shinyUI(navbarPage("Exploratory binary classifier construction",
                                     "", 
                                     choices = list("Logistic regression" = "logit",
                                                 "Penalized logistic regression" = "pen_logit",
-                                                "Support vector machine" = "svm"))
+                                                "Support vector machine" = "svm")),
                      hr(),
                      
                      h3("Classifier parameters"),
@@ -64,5 +65,5 @@ shinyUI(navbarPage("Exploratory binary classifier construction",
                    mainPanel(
                      )
                    )),
-        tabPanel("Classifier evaluation")   
+        tabPanel("Classifier performance")   
         ))
