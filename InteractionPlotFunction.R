@@ -171,7 +171,7 @@ mainPlotFunction <- function(xVar=NULL,yVar=NULL,facetX=NULL,facetY=NULL,respons
   
   #Temporary faceting variables for testing
   ###############
-  tempData <- data.frame(tempData,xfac=rbinom(nrow(data),1,0.5),yfac=rbinom(nrow(data),1,0.5))
+  #tempData <- data.frame(tempData,xfac=rbinom(nrow(data),1,0.5),yfac=rbinom(nrow(data),1,0.5))
   ################
   
   #return null if no variables are selected
@@ -221,8 +221,8 @@ mainPlotFunction <- function(xVar=NULL,yVar=NULL,facetX=NULL,facetY=NULL,respons
     }
     
     #Setting up "new data"
-    grid <- expand.grid(x=seq(from=xRange[1],to=xRange[2],length.out=20),
-                        y=seq(from=yRange[1],to=yRange[2],length.out=20))
+    grid <- expand.grid(x=seq(from=xRange[1],to=xRange[2],length.out=100),
+                        y=seq(from=yRange[1],to=yRange[2],length.out=100))
     names(grid) <- c(xVar,yVar)
     grid <- data.frame(grid)
     pred <- predict.gam(smoothFit,newdata=grid,type="response")
@@ -251,8 +251,13 @@ mainPlotFunction <- function(xVar=NULL,yVar=NULL,facetX=NULL,facetY=NULL,respons
   commandPlot <- paste(commandPlot,"+ geom_tile(data=predictionFacets,aes(x=",xVar,",y=",yVar,",fill=predictions),alpha=0.3)")
   commandPlot <- paste(commandPlot,"+ geom_point(data=tempData,aes(x=,",xVar,",y=",yVar,",color=",response,"))")
   commandPlot <- paste(commandPlot,"+ facet_grid(",facetX,"~",facetY,",labeller='label_both')")
-  commandPlot <- paste(commandPlot,"+scale_fill_gradient2(midpoint=0.5,mid='white',high='blue',low='red')")
-  commandPlot <- paste(commandPlot,"+scale_color_manual(values=c('red3','navy'))")
+  commandPlot <- paste(commandPlot,"+ scale_fill_gradient2(midpoint=0.5,mid='white',high='blue',low='red')")
+  commandPlot <- paste(commandPlot,"+ scale_color_manual(values=c('red3','navy'))")
+  commandPlot <- paste(commandPlot,"+ scale_x_continuous(expand=c(0,0))")
+  commandPlot <- paste(commandPlot,"+ scale_y_continuous(expand=c(0,0))")
+  commandPlot <- paste(commandPlot,"+ guides(fill = guide_legend(override.aes = list(alpha = 0.3)))")
+  commandPlot <- paste(commandPlot,"+ theme_bw()")
+  
   ggPlot <- eval(parse(text=commandPlot))
   
   return(ggPlot)
@@ -262,6 +267,8 @@ mainPlotFunction <- function(xVar=NULL,yVar=NULL,facetX=NULL,facetY=NULL,respons
 # result <- fitGlmnetModel(response,varsInModel,data,lambda=NULL)
 # error <- result$error
 # interactionPlot(varsInModel,data,error)
+#
+# mainPlotFunction(xVar="Sepal.Length",yVar="Petal.Width",facetX=NULL,facetY=NULL,response="response",data,predictions)
 
 
 
