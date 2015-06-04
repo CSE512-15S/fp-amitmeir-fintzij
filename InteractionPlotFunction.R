@@ -5,7 +5,7 @@ interactionPlot <- function(varsInModel,data,error) {
   if(length(varsInModel)==0) {
     stupidData <- data.frame(a=1:3,b=1:3)
     stupidGGVIS <- ggvis(data=stupidData,x=~a,y=~b,opacity=0) %>% layer_points()  %>%
-    set_options(keep_aspect=TRUE,resizable=TRUE)
+      set_options(keep_aspect=TRUE,resizable=TRUE)
     return(stupidGGVIS)
   }
   
@@ -73,7 +73,7 @@ interactionPlot <- function(varsInModel,data,error) {
     scale_nominal("y", padding = 0, points = FALSE) %>%
     add_tooltip(interactionToolTip, "hover") %>%
     add_tooltip(clickToolTip,"click")
-      
+  
   return(ggvisPlot)
 }
 
@@ -83,7 +83,7 @@ mainEffectPlot <- function(allVariables,varsInModel,response,data,error=NULL) {
     stupidData <- data.frame(a=1:3,b=1:3)
     stupidGGVIS <- ggvis(data=stupidData,x=~a,y=~b,opacity=0) %>% 
       layer_points() %>%
-      set_options(keep_aspect=TRUE,resizable=TRUE)
+      set_options(height = 100, keep_aspect=TRUE,resizable=TRUE)
     return(stupidGGVIS)
   }
   
@@ -93,9 +93,9 @@ mainEffectPlot <- function(allVariables,varsInModel,response,data,error=NULL) {
   for(i in 1:nVars) {
     if(FALSE) { #if(allVariables[i] %in% varsInModel) {
       correlations$correlation[i] <- 1
-      } else {
-        commandComputeCor <- "with(data,cor("
-        if(is.null(varsInModel)) {
+    } else {
+      commandComputeCor <- "with(data,cor("
+      if(is.null(varsInModel)) {
         commandComputeCor <- paste(commandComputeCor,response)
       } else { 
         commandComputeCor <- paste(commandComputeCor,"error")
@@ -141,16 +141,19 @@ mainEffectPlot <- function(allVariables,varsInModel,response,data,error=NULL) {
   
   correlations$id <- 1:nrow(correlations)
   correlations$zeros <- rep(0,nrow(correlations))
-  correlations$absCorrelation <- abs(correlations$correlation) 
+  correlations$absCorrelation <- correlations$correlation 
   
   ggvisPlot <- ggvis(data=correlations,x=~variable,y=~absCorrelation,fill:=~def.color,key:=~id) %>% 
-    layer_points(size:=5000/length(allVariables),fillOpacity=0.75,fillOpacity.hover=1) %>%
+    layer_points(size:=1000/length(allVariables), shape := "diamond", fillOpacity=0.75,fillOpacity.hover=1) %>%
+    add_axis("x", title = "Variable") %>%
+    add_axis("y", title = "Correlation") %>%
+    scale_numeric("y", domain = c(-1, 1), nice = TRUE) %>%
     #layer_rects(width=band()) %>%
     add_tooltip(interactionToolTip, "hover") %>%
     add_tooltip(clickToolTip,"click") %>%
     layer_points(x:=0,y=1,opacity=0) %>% #For setting axes limits
-    set_options(keep_aspect=TRUE,resizable=TRUE)
-
+    set_options(height = 200, keep_aspect=TRUE, resizable=TRUE)
+  
   return(ggvisPlot)
 }
 
@@ -176,7 +179,7 @@ fitGlmnetModel <- function(response,varsInModel,data,lambda=NULL,family="binomia
     lambda <- 0
     return(list(fit=fit,prediction=predictions,error=errors,penalty=lambda))
   }
-    
+  
   require(glmnet)
   #Generating design matrix
   commandDesignMatrix <- "X <- model.frame(~1"
@@ -331,11 +334,3 @@ plotCV <- function(fit) {
 # mainPlotFunction(xVar="Sepal.Length",yVar="Petal.Width",facetX="facx",facetY="facy",response="response",data,predictions)
 # 
 # plotROC(response,predictions,data)
-
-
-
-
-
-
-
-
