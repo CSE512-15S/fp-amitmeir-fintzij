@@ -320,8 +320,8 @@ mainEffectPlot <- function(allVariables,varsInModel,response,data,error=NULL) {
 # data$facx <- rbinom(nrow(data),1,0.5)
 # data$facy <- rbinom(nrow(data),1,0.5)
 # mainPlotFunction(xVar="Sepal.Length",yVar="Petal.Width",facetX="facx",facetY="facy",response="response",data,predictions)
-
-
+# 
+# plotROC(response,predictions,data)
 
 
 
