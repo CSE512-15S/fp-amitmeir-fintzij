@@ -148,7 +148,7 @@ fitGlmnetModel <- function(response,varsInModel,data,lambda=NULL,family="binomia
     commandFitIntercept <- paste("glm(",response,"~ 1,family=",family,",data=data)")
     fit <- eval(parse(text=commandFitIntercept))
     predictions <- predict(fit,type="response")
-    commandErrors <- paste("with(data,predictions-",response,")"))
+    commandErrors <- paste("with(data,predictions-",response,")")
     errors <- eval(parse(text=commandErrors))
     lambda <- 0
     return(list(fit=fit,prediction=predictions,error=errors,penalty=lambda))
