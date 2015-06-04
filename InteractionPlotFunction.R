@@ -26,7 +26,7 @@ interactionPlot <- function(varsInModel,data,error) {
     }
   }
   
-  #interactions[,3] <- runif(min=-1,max=1,nrow(interactions))
+  interactions[,3] <- runif(min=-1,max=1,nrow(interactions))
   
   interactions$roundCor <- round(interactions$errorCorrelation,2)
   
@@ -145,7 +145,8 @@ mainEffectPlot <- function(allVariables,varsInModel,response,data,error=NULL) {
     #layer_rects(width=band()) %>%
     add_tooltip(interactionToolTip, "hover") %>%
     add_tooltip(clickToolTip,"click") %>%
-    layer_points(x:=0,y=1,opacity=0) #For setting axes limits
+    layer_points(x:=0,y=1,opacity=0) %>% #For setting axes limits
+    set_options(keep_aspect=TRUE,resizable=TRUE)
 
   return(ggvisPlot)
 }
@@ -311,8 +312,10 @@ plotCV <- function(fit) {
 # error <- result$error
 # predictions <- result$prediction
 # interactionPlot(varsInModel,data,error)
-# mainEffectPlot(allVariables,varsInModel,response,data,error=error) 
-# mainPlotFunction(xVar="Sepal.Length",yVar="Petal.Width",facetX=NULL,facetY=NULL,response="response",data,predictions)
+# mainEffectPlot(allVariables,varsInModel,response,data,error=error)
+# data$facx <- rbinom(nrow(data),1,0.5)
+# data$facy <- rbinom(nrow(data),1,0.5)
+# mainPlotFunction(xVar="Sepal.Length",yVar="Petal.Width",facetX="facx",facetY="facy",response="response",data,predictions)
 
 
 
