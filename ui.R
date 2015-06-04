@@ -45,26 +45,32 @@ shinyUI(navbarPage("Exploratory binary classifier construction",
              ),
         tabPanel("Classifier construction",
                  fluidRow(
-                   column(6,
-                          h3("Variable selection")),
-                   column(6,
-                          h3("Boundary visualization"))
-                   ),
-                 hr(),
-                 fluidRow(
-                   column(4,
-                          offset = 1,
-                          h4("Select classifier"),
+                   column(3,
                           selectizeInput("classifier", 
-                                         label = NULL, 
+                                         h4("Select classifier"),
                                          choices = list("Logistic L1 regression" = "logit",
-                                                        "Linear L1 regression" = "linear")),
-                          textOutput("printresponse"),
-                          uiOutput("tuning_params")
+                                                        "Linear L1 regression" = "linear"))),
+                   column(3,
+                          numericInput("lambda", label = h4("Penalty"), value = 0)
                           ),
-                   column(4,
-                          offset=2,
-                          h4("Visualization settings"))
+                   column(6,
+                          strong("Response: "), em(textOutput("printresponse", inline = T)),
+                          br(),
+                          strong("Predictors: "), em(textOutput("printpreds", inline = T))
+                          )
+                 ),
+                 fluidRow(
+                   column(6,
+                          h3("Variable selection"),
+                          hr(),
+                          ggvisOutput("mainEffectsPlot"),
+                          ggvisOutput("interactionplot"),
+                          textOutput("printlambda")
+                            ),
+                   column(6,
+                          h3("Boundary visualization"),
+                   hr(),
+                   h4("Visualization settings"))
                    )
                  ),
 #         tabPanel("Classifier construction",
