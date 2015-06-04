@@ -1,5 +1,6 @@
 require(pROC)
 
+#A function for creating the interaction interface plot
 interactionPlot <- function(varsInModel,data,error) {
   if(length(varsInModel)==0) return(NULL)
   
@@ -71,10 +72,13 @@ interactionPlot <- function(varsInModel,data,error) {
   return(ggvisPlot)
 }
 
+#A function for creating the main effect interface plot
 mainEffectPlot <- function(allVariables,varsInModel,response,data,error=NULL) {
+  if(is.null(allVariables)) return(NULL)
+  
   #Computing correlations
   nVars <- length(allVariables)
-  correlations <- data.frame(variable=allVariables,correlation=nVars)
+  correlations <- data.frame(variable=allVariables,correlation=rep(nVars,nVars))
   for(i in 1:nVars) {
     if(FALSE) { #if(allVariables[i] %in% varsInModel) {
       correlations$correlation[i] <- 1
@@ -138,12 +142,13 @@ mainEffectPlot <- function(allVariables,varsInModel,response,data,error=NULL) {
   return(ggvisPlot)
 }
 
+#A function for fitting a glmnet model
 fitGlmnetModel <- function(response,varsInModel,data,lambda=NULL,family="binomial") {
   if(is.null(varsInModel)) {
     commandFitIntercept <- paste("glm(",response,"~ 1,family=",family,",data=data)")
     fit <- eval(parse(text=commandFitIntercept))
     predictions <- predict(fit,type="response")
-    commandErrors <- paste("with(data,predictions-response)")
+    commandErrors <- paste("with(data,predictions-",response,")")
     errors <- eval(parse(text=commandErrors))
     lambda <- 0
     return(list(fit=fit,prediction=predictions,error=errors,penalty=lambda))
@@ -173,11 +178,15 @@ fitGlmnetModel <- function(response,varsInModel,data,lambda=NULL,family="binomia
   return(list(fit=fit,prediction=prediction,error=error,penalty=fit$lambda))
 }
 
+#A function for the main model fit plot
 mainPlotFunction <- function(xVar=NULL,yVar=NULL,facetX=NULL,facetY=NULL,response=NULL,data,predictions) {
   #Constructing data set for the plot
   tempData <- data[,which(names(data) %in% c(xVar,yVar,facetX,facetY,response))]
   tempData <- cbind(tempData,predictions=predictions)
   names(tempData)[ncol(tempData)] <- "predictions"
+  #convert response to boolean
+  commandBoolean <- paste("tempData$",response," <- tempData$",response,"==max(tempData$",response,")") 
+  eval(parse(text=commandBoolean))
   
   #Temporary faceting variables for testing
   ###############
@@ -273,6 +282,7 @@ mainPlotFunction <- function(xVar=NULL,yVar=NULL,facetX=NULL,facetY=NULL,respons
   return(ggPlot)
 }
 
+#A function for plotting the ROC.
 plotROC <- function(response,predictions,data) {
   require(pROC)
   commandROC <- paste("with(data,roc(",response,"~predictions))")
@@ -280,7 +290,12 @@ plotROC <- function(response,predictions,data) {
   return(plot(smooth(rocObject),main=paste("Area Under the Curve:",rocObject$auc)))
 }
 
-# plot(fit)
+
+#A function for plotting the cross validation plot 
+plotCV <- function(fit) {
+  if(is.null(fit)) return(NULL)
+  return(plot(fit))
+}
 
 # #TEST
 # result <- fitGlmnetModel(response,varsInModel,data,lambda=NULL,family='binomial')
