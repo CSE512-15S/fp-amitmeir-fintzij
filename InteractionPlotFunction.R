@@ -156,9 +156,20 @@ mainEffectPlot <- function(allVariables,varsInModel,response,data,error=NULL) {
 
 #A function for fitting a glmnet model
 fitGlmnetModel <- function(response,varsInModel,data,lambda=NULL,family="binomial") {
+  #If not predictors fit intercept
   if(is.null(varsInModel)) {
     commandFitIntercept <- paste("glm(",response,"~ 1,family=",family,",data=data)")
     fit <- eval(parse(text=commandFitIntercept))
+    predictions <- predict(fit,type="response")
+    commandErrors <- paste("with(data,predictions-",response,")")
+    errors <- eval(parse(text=commandErrors))
+    lambda <- 0
+    return(list(fit=fit,prediction=predictions,error=errors,penalty=lambda))
+  }
+  
+  #If only one predictor don't regularize
+  if(length(varsInModel==1)) {
+    commandFitIntercept <- paste("glm(",response,"~ ",varsInModel[1],",family=",family,",data=data)")
     predictions <- predict(fit,type="response")
     commandErrors <- paste("with(data,predictions-",response,")")
     errors <- eval(parse(text=commandErrors))
@@ -320,8 +331,8 @@ plotCV <- function(fit) {
 # mainPlotFunction(xVar="Sepal.Length",yVar="Petal.Width",facetX="facx",facetY="facy",response="response",data,predictions)
 # 
 # plotROC(response,predictions,data)
-
-
+# 
+# 
 
 
 
