@@ -27,7 +27,7 @@ interactionPlot <- function(varsInModel,data,error) {
     }
   }
   
-  interactions[,3] <- runif(min=-1,max=1,nrow(interactions))
+  #interactions[,3] <- runif(min=-1,max=1,nrow(interactions))
   
   interactions$roundCor <- round(interactions$errorCorrelation,2)
   
@@ -56,24 +56,23 @@ interactionPlot <- function(varsInModel,data,error) {
   
   clickToolTip <- function(x) {
     if(is.null(x)) return(NULL)
-    row <- interactions[interactions$id == x$id, ]
-    print(c(as.character(row$var1),as.character(row$var2)))
-    return(NULL)
+    row <- interactions[interactions$id == x$id,1:2]
+    return(row)
   }
   
   interactions$id <- 1:nrow(interactions)
   interactions$errorCorRound2 <- round(interactions$errorCorrelation,2)
   
   ggvisPlot <- ggvis(data=interactions,x=~var1,y=~var2,fill:=~def.color,key:=~id) %>% 
-    #layer_points() %>%
     layer_rects(width=band(),height=band(),fillOpacity:=0.8,fillOpacity.hover:=1) %>% 
-    #layer_rects() %>% 
     layer_text(text:=~errorCorRound2, stroke:="black",fill:="white", align:="left", baseline:="top",fontSize:=100/length(varsInModel)) %>%
     scale_nominal("x", padding = 0, points = FALSE) %>% 
     scale_nominal("y", padding = 0, points = FALSE) %>%
     add_tooltip(interactionToolTip, "hover") %>%
-    add_tooltip(clickToolTip,"click")
+    add_tooltip(clickToolTip,"click") %>%
+    bind_shiny("ggvisInteraction")
   
+  ggvisPlot
   return(ggvisPlot)
 }
 
@@ -152,7 +151,8 @@ mainEffectPlot <- function(allVariables,varsInModel,response,data,error=NULL) {
     add_tooltip(interactionToolTip, "hover") %>%
     add_tooltip(clickToolTip,"click") %>%
     layer_points(x:=0,y=1,opacity=0) %>% #For setting axes limits
-    set_options(height = 200, keep_aspect=TRUE, resizable=TRUE)
+    set_options(height = 200, keep_aspect=TRUE, resizable=TRUE) %>%
+    bind_shiny("ggvisMainEffect")
   
   return(ggvisPlot)
 }
@@ -171,7 +171,7 @@ fitGlmnetModel <- function(response,varsInModel,data,lambda=NULL,family="binomia
   }
   
   #If only one predictor don't regularize
-  if(length(varsInModel==1)) {
+  if(length(varsInModel)==1) {
     commandFitIntercept <- paste("glm(",response,"~ ",varsInModel[1],",family=",family,",data=data)")
     predictions <- predict(fit,type="response")
     commandErrors <- paste("with(data,predictions-",response,")")
@@ -192,7 +192,7 @@ fitGlmnetModel <- function(response,varsInModel,data,lambda=NULL,family="binomia
   #Fitting Model 
   commandFitModel <- paste("fit <- cv.glmnet(y=data$",response,",x=as.matrix(X),family='",family,"')",sep="")
   eval(parse(text=commandFitModel))
-  
+    
   if(is.null(lambda)) {
     prediction <- predict(fit,newx=as.matrix(X),type="response")
   } else {
@@ -323,6 +323,18 @@ plotCV <- function(fit) {
 }
 
 # #TEST
+# result <- fitGlmnetModel(response,varsInModel,data,lambda=NULL,family='binomial')
+# fit <- result$fit
+# error <- result$error
+# predictions <- result$prediction
+# interactionPlot(varsInModel,data,error)
+# mainEffectPlot(allVariables,varsInModel,response,data,error=error)
+# data$facx <- rbinom(nrow(data),1,0.5)
+# data$facy <- rbinom(nrow(data),1,0.5)
+# mainPlotFunction(xVar="Sepal.Length",yVar="Petal.Width",facetX="facx",facetY="facy",response="response",data,predictions)
+# 
+# plotROC(response,predictions,data)
+
 # result <- fitGlmnetModel(response,varsInModel,data,lambda=NULL,family='binomial')
 # fit <- result$fit
 # error <- result$error
