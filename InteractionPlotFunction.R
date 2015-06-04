@@ -307,9 +307,10 @@ mainEffectPlot <- function(allVariables,varsInModel,response,data,error=NULL) {
     plotCV <- function(fit) {
       if(is.null(fit)) return(NULL)
       return(plot(fit))
-}
+  }
 
-# # #TEST
+
+# #TEST
 # result <- fitGlmnetModel(response,varsInModel,data,lambda=NULL,family='binomial')
 # fit <- result$fit
 # error <- result$error
