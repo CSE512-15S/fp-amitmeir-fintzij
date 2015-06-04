@@ -2,7 +2,11 @@ require(pROC)
 
 #A function for creating the interaction interface plot
 interactionPlot <- function(varsInModel,data,error) {
-  if(length(varsInModel)==0) return(NULL)
+  if(length(varsInModel)==0) {
+    stupidData <- data.frame(a=1:3,b=1:3)
+    stupidGGVIS <- ggvis(data=stupidData,x=~a,y=~b,opacity=0) %>% layer_points()
+    return(stupidGGVIS)
+  }
   
   #Computing correlations with error
   varsInModel <- sort(varsInModel)
@@ -77,7 +81,7 @@ mainEffectPlot <- function(allVariables,varsInModel,response,data,error=NULL) {
   if(is.null(allVariables)) {
     stupidData <- data.frame(a=1:3,b=1:3)
     stupidGGVIS <- ggvis(data=stupidData,x=~a,y=~b,opacity=0) %>% layer_points()
-    return(stupidGGIVS)
+    return(stupidGGVIS)
   }
   
   #Computing correlations
