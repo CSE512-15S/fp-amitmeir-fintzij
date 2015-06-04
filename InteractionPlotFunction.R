@@ -309,15 +309,15 @@ plotCV <- function(fit) {
 }
 
 # #TEST
-result <- fitGlmnetModel(response,varsInModel,data,lambda=NULL,family='binomial')
-fit <- result$fit
-error <- result$error
-predictions <- result$prediction
-interactionPlot(varsInModel,data,error)
-mainEffectPlot(allVariables,varsInModel,response,data,error=error)
-data$facx <- rbinom(nrow(data),1,0.5)
-data$facy <- rbinom(nrow(data),1,0.5)
-mainPlotFunction(xVar="Sepal.Length",yVar="Petal.Width",facetX="facx",facetY="facy",response="response",data,predictions)
+# result <- fitGlmnetModel(response,varsInModel,data,lambda=NULL,family='binomial')
+# fit <- result$fit
+# error <- result$error
+# predictions <- result$prediction
+# interactionPlot(varsInModel,data,error)
+# mainEffectPlot(allVariables,varsInModel,response,data,error=error)
+# data$facx <- rbinom(nrow(data),1,0.5)
+# data$facy <- rbinom(nrow(data),1,0.5)
+# mainPlotFunction(xVar="Sepal.Length",yVar="Petal.Width",facetX="facx",facetY="facy",response="response",data,predictions)
 
 
 
