@@ -202,7 +202,7 @@ fitGlmnetModel <- function(response,varsInModel,data,lambda=NULL,family="binomia
   
   commandComputeError <- paste("error <- prediction-data$",response)
   eval(parse(text=commandComputeError))
-  return(list(fit=fit,prediction=prediction,error=error,penalty=fit$lambda))
+  return(list(fit=fit,prediction=prediction,error=error,penalty=fit$lambda,optimal=fit$lambda.min))
 }
 
 #A function for the main model fit plot
