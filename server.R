@@ -1,11 +1,11 @@
 # server.R performs the server-side calculations for ui.R
 
-# source("InteractionPlotFunction.R")
-# source("basicViz.R")
-# source("basicVizGGVIS.R")
 library(glmnet)
 library(ggvis)
 library(graphics)
+library(pROC)
+library(gam)
+source("InteractionPlotFunction.R")
 
 shinyServer(function(input, output, session) { 
   # reactive expression for the dataset
@@ -31,7 +31,7 @@ shinyServer(function(input, output, session) {
     return(dat)
 
   })
-  
+    
   # code for mutually exclusive selection of predictors and response
   
   # server function to render the data table          
@@ -73,91 +73,97 @@ shinyServer(function(input, output, session) {
     
   })
   
-  
   variables <- reactiveValues(allVars = NULL,
                               responseVar = NULL,
                               predictorVars = NULL,
                               varsInModel = NULL)
   
+  fittedmod <- reactiveValues(fit = NULL,
+                              prediction = NULL,
+                              error = NULL,
+                              penalty = isolate(input$lambda))
+  
   observe({
+    
     variables$allVars <- names(inputData())
     variables$responseVar <- input$response 
     variables$predictorVars <- setdiff(isolate(variables$allVars), isolate(variables$responseVar))
   })
   
-  output$printresponse <- renderText({
-    
+  
+  model <- reactive({
+    dataset <- inputData()
     responsevar <- isolate(variables$responseVar)
+    varsinmod <- isolate(variables$varsInModel)
+    penalty <- fittedmod$penalty
     
-    print(responsevar)
+    fitGlmnetModel(response = responsevar, varsInModel = varsinmod, lambda = penalty, data = dataset)
     
   })
   
+  reactive({
+    fitmod <- model()
+    
+    fittedmod$fit <- fitmod$fit
+    fittedmod$responseVar <- fitmod$prediction
+    fittedmod$error <- fitmod$error
+    fittedmod$penalty <- fitmod$penalty
 
-#     # REACTIVE VALUES :
-#   R <- reactiveValues(oldpredictors=0, oldresponse=0) 
-# 
-#   # REACTIVE VALUES :
-#   XY <- reactiveValues(predictors=NULL,  response=NULL, count=0)
-# 
-#   observe({
-#     if(!is.null(XY$predictors) && !is.null(XY$response)) XY$count <- isolate(XY$count) + any(XY$predictors==XY$response)
-#   })
-#   output$count <- renderText({ XY$count })
-# 
-#   
-#   # the case of one of the predictors set to the same value as the reponse
-#   
-#   observe({
-#     if(!is.null(input$response)){
-#       R$oldpredictors <- isolate(input$predictors)
-#     }
-#   })
-#   observe({
-#     if(!is.null(input$predictors)){
-#       if(all(input$predictors!=isolate(input$response))){
-#         R$oldpredictors <- input$predictors
-#         XY$predictors <- input$predictors; XY$response <- isolate(input$response)
-#       }
-#       else{ # we exchange the matching predictor and response 
-#         oldpredictors <- isolate(R$oldpredictors)
-#         updateSelectInput(session, "response", choices=names(input$dataset), selected=oldpredictors)
-#         XY$predictors <- input$predictors; XY$response <- oldpredictors 
-#       }
-#     }
-#   })
-#   ##
-#   #
-#   # 2) the case of the response being set to the same value as a predictor
-#   #
-#   observe({
-#     if(!is.null(input$predictors)){
-#       R$oldresponse <- isolate(input$response)
-#     }
-#   })
-#   observe({
-#     if(!is.null(input$response)){
-#       if(all(input$response!=isolate(input$predictors))){
-#         R$oldresponse <- input$response
-#         XY$predictors <- isolate(input$predictors); XY$response <- input$response
-#       }
-#       else{  #  exchange predictors and response 
-#         oldresponse <- isolate(R$oldresponse)
-#         updateSelectInput(session, "predictors", choices=names(input$dataset), selected=oldresponse)
-#         XY$predictors <- oldresponse; XY$response <- input$response
-#       }
-#     }
-#   })
-#   
-#   output$maineffects <- renderPlot({
-#     
-#     inFile <- inputData()
-#     
-#     allVariables <- names(inFile)
-#     
-#     mainEffectPlot(allVariables,varsInModel,response,data,error=NULL)
-#     
-#   })
+  })
+  
+
+  output$printlambda <- renderText({
+    
+    fittedmod <- model()
+    lambda <- isolate(fittedmod$penalty)
+    print(lambda)
+    
+  })
+  
+  # printresponse
+  output$printresponse <- renderPrint({
+    
+    responsevar <- isolate(variables$responseVar)
+    
+    cat(responsevar)
+    
+  })
+  
+  output$printpreds <- renderPrint({
+    
+    predvars <- isolate(variables$varsInModel)
+    
+    if(is.null(predvars)) predvars <- "None selected"
+    
+    cat(predvars, sep = ", ")
+    
+  })
+  
+  # main effects plot
+  reactive({
+    
+    dat <- inputData()
+    
+    predictors <- variables$predictorVars
+    varsinmodel <- variables$varsInModel
+    responsevar <- variables$responseVar
+    error <- fittedmod$error
+    
+    mainEffectPlot(allVariables = predictors, varsInModel = varsinmodel, response = responsevar, data = dat, error=error)
+    
+  }) %>% bind_shiny("mainEffectsPlot")
+  
+  # interactions plot
+  reactive({
+    
+    dat <- inputData()
+    
+    varsinmodel <- variables$varsInModel
+    err <- fittedmod$error
+    
+    interactionPlot(varsInModel = varsinmodel, data = dat, error = err)
+    
+  }) %>% bind_shiny("interactionplot")
   
   
   # selectizeInput for plot margins
@@ -231,7 +237,5 @@ shinyServer(function(input, output, session) {
     }
   })
   
-#   output$maineffects <- renderPlot({
-#     
-#   })
+
 })
