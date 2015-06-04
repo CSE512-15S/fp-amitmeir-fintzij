@@ -5,6 +5,7 @@
 # source("basicVizGGVIS.R")
 library(glmnet)
 library(ggvis)
+library(graphics)
 
 shinyServer(function(input, output, session) { 
   # reactive expression for the dataset
@@ -16,11 +17,18 @@ shinyServer(function(input, output, session) {
     # column will contain the local filenames where the data can be found.
     inFile <- input$dataset
 
-    if(is.null(inFile))
-
-    return(iris)
-
-    read.csv(inFile$datapath, header = input$header, sep = input$sep, quote = input$quote)
+    if(!is.null(inFile)){
+      dat <- read.csv(inFile$datapath, header = input$header, sep = input$sep, quote = input$quote)
+      
+    } else{
+      dat <- iris
+      
+      dat$is.virginica <- ifelse(dat$Species == "virginica", TRUE, FALSE)
+      dat$Species <- NULL
+      
+    }
+    
+    return(dat)
 
   })
   
@@ -56,38 +64,15 @@ shinyServer(function(input, output, session) {
     # extract variable names
     varnames <- names(inFile)
     
+    binary.vars <- apply(inFile, 2, function(x) ifelse(length(unique(x)) == 2, T, F))
+    
+    varnames <- varnames[binary.vars]
+    
     # generate selectizeInputs
     selectizeInput("response", "Response Variable", choices = varnames)  
     
   })
   
-  
-  # update options for predictors based on selection of response 
-  
-  output$selectpreds <- renderPlot({
-            
-    response <- isolate(input$response)
-    
-    predopts <- names(inputData())
-    
-    predopts <- predopts[predopts != response]
-        
-    selectizeInput("selectpreds", "Select predictors", choices = predopts)
-    
-  })
-  
-  predictorVars <- reactive({
-    
-    response <- isolate(input$response)
-    
-    predopts <- names(inputData())
-    
-    predopts <- predopts[predopts != response]
-    
-    return(predopts)
-    
-  })
-
   
   variables <- reactiveValues(allVars = NULL,
                               responseVar = NULL,

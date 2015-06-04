@@ -8,7 +8,7 @@ shinyUI(navbarPage("Exploratory binary classifier construction",
                    
         tabPanel("Upload and view data",
              sidebarLayout(
-               sidebarPanel(fileInput('dataset', 'Choose file to upload',
+               sidebarPanel(fileInput('dataset', 'Upload dataset with at least one binary response:',
                                       accept = c(
                                         'text/csv',
                                         'text/comma-separated-values',
