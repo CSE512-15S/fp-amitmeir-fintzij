@@ -74,7 +74,11 @@ interactionPlot <- function(varsInModel,data,error) {
 
 #A function for creating the main effect interface plot
 mainEffectPlot <- function(allVariables,varsInModel,response,data,error=NULL) {
-  if(is.null(allVariables)) return(NULL)
+  if(is.null(allVariables)) {
+    stupidData <- data.frame(a=1:3,b=1:3)
+    stupidGGVIS <- ggvis(data=stupidData,x=~a,y=~b,opacity=0) %>% layer_points()
+    return(stupidGGIVS)
+  }
   
   #Computing correlations
   nVars <- length(allVariables)
