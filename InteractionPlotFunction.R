@@ -4,7 +4,8 @@ require(pROC)
 interactionPlot <- function(varsInModel,data,error) {
   if(length(varsInModel)==0) {
     stupidData <- data.frame(a=1:3,b=1:3)
-    stupidGGVIS <- ggvis(data=stupidData,x=~a,y=~b,opacity=0) %>% layer_points()
+    stupidGGVIS <- ggvis(data=stupidData,x=~a,y=~b,opacity=0) %>% layer_points()  %>%
+    set_options(keep_aspect=TRUE,resizable=TRUE)
     return(stupidGGVIS)
   }
   
@@ -306,15 +307,15 @@ plotCV <- function(fit) {
 }
 
 # #TEST
-# result <- fitGlmnetModel(response,varsInModel,data,lambda=NULL,family='binomial')
-# fit <- result$fit
-# error <- result$error
-# predictions <- result$prediction
-# interactionPlot(varsInModel,data,error)
-# mainEffectPlot(allVariables,varsInModel,response,data,error=error)
-# data$facx <- rbinom(nrow(data),1,0.5)
-# data$facy <- rbinom(nrow(data),1,0.5)
-# mainPlotFunction(xVar="Sepal.Length",yVar="Petal.Width",facetX="facx",facetY="facy",response="response",data,predictions)
+result <- fitGlmnetModel(response,varsInModel,data,lambda=NULL,family='binomial')
+fit <- result$fit
+error <- result$error
+predictions <- result$prediction
+interactionPlot(varsInModel,data,error)
+mainEffectPlot(allVariables,varsInModel,response,data,error=error)
+data$facx <- rbinom(nrow(data),1,0.5)
+data$facy <- rbinom(nrow(data),1,0.5)
+mainPlotFunction(xVar="Sepal.Length",yVar="Petal.Width",facetX="facx",facetY="facy",response="response",data,predictions)
 
 
 
