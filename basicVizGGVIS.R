@@ -1,7 +1,3 @@
-library(ggvis)
-library(ggplot2)
-require(gam)
-
 generateMainPlot <- function(xVar=NULL,
                              yVar=NULL,
                              response=NULL,
