@@ -72,9 +72,11 @@ interactionPlot <- function(varsInModel,data,error) {
 }
 
 mainEffectPlot <- function(allVariables,varsInModel,response,data,error=NULL) {
+  if(is.null(allVariables)) return(NULL)
+  
   #Computing correlations
   nVars <- length(allVariables)
-  correlations <- data.frame(variable=allVariables,correlation=nVars)
+  correlations <- data.frame(variable=allVariables,correlation=rep(nVars,nVars))
   for(i in 1:nVars) {
     if(FALSE) { #if(allVariables[i] %in% varsInModel) {
       correlations$correlation[i] <- 1
@@ -178,6 +180,9 @@ mainPlotFunction <- function(xVar=NULL,yVar=NULL,facetX=NULL,facetY=NULL,respons
   tempData <- data[,which(names(data) %in% c(xVar,yVar,facetX,facetY,response))]
   tempData <- cbind(tempData,predictions=predictions)
   names(tempData)[ncol(tempData)] <- "predictions"
+  #convert response to boolean
+  commandBoolean <- paste("tempData$",response," <- tempData$",response,"==max(tempData$",response,")") 
+  eval(parse(text=commandBoolean))
   
   #Temporary faceting variables for testing
   ###############
