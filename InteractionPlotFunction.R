@@ -280,16 +280,16 @@ plotROC <- function(response,predictions,data) {
   return(plot(smooth(rocObject),main=paste("Area Under the Curve:",rocObject$auc)))
 }
 
-plot(fit)
+# plot(fit)
 
 # #TEST
-result <- fitGlmnetModel(response,varsInModel,data,lambda=NULL,family='binomial')
-fit <- result$fit
-error <- result$error
-predictions <- result$prediction
-interactionPlot(varsInModel,data,error)
-mainEffectPlot(allVariables,varsInModel,response,data,error=error) 
-mainPlotFunction(xVar="Sepal.Length",yVar="Petal.Width",facetX=NULL,facetY=NULL,response="response",data,predictions)
+# result <- fitGlmnetModel(response,varsInModel,data,lambda=NULL,family='binomial')
+# fit <- result$fit
+# error <- result$error
+# predictions <- result$prediction
+# interactionPlot(varsInModel,data,error)
+# mainEffectPlot(allVariables,varsInModel,response,data,error=error) 
+# mainPlotFunction(xVar="Sepal.Length",yVar="Petal.Width",facetX=NULL,facetY=NULL,response="response",data,predictions)
 
 
 
