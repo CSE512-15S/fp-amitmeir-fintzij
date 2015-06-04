@@ -168,7 +168,7 @@ fitGlmnetModel <- function(response,varsInModel,data,lambda=NULL,family="binomia
     commandErrors <- paste("with(data,predictions-",response,")")
     errors <- eval(parse(text=commandErrors))
     lambda <- 0
-    return(list(fit=fit,prediction=predictions,error=errors,penalty=lambda))
+    return(list(fit=fit,prediction=predictions,error=errors,penalty=lambda,optimal=lambda))
   }
   
   #If only one predictor don't regularize
@@ -178,7 +178,7 @@ fitGlmnetModel <- function(response,varsInModel,data,lambda=NULL,family="binomia
     commandErrors <- paste("with(data,predictions-",response,")")
     errors <- eval(parse(text=commandErrors))
     lambda <- 0
-    return(list(fit=fit,prediction=predictions,error=errors,penalty=lambda))
+    return(list(fit=fit,prediction=predictions,error=errors,penalty=lambda,optimal=lambda))
   }
   
   require(glmnet)
