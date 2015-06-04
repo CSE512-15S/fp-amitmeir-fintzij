@@ -142,13 +142,13 @@ mainEffectPlot <- function(allVariables,varsInModel,response,data,error=NULL) {
   return(ggvisPlot)
 }
 
-
+#A function for fitting a glmnet model
 fitGlmnetModel <- function(response,varsInModel,data,lambda=NULL,family="binomial") {
   if(is.null(varsInModel)) {
     commandFitIntercept <- paste("glm(",response,"~ 1,family=",family,",data=data)")
     fit <- eval(parse(text=commandFitIntercept))
     predictions <- predict(fit,type="response")
-    commandErrors <- paste("with(data,predictions-response)")
+    commandErrors <- paste("with(data,predictions-",response,")"))
     errors <- eval(parse(text=commandErrors))
     lambda <- 0
     return(list(fit=fit,prediction=predictions,error=errors,penalty=lambda))
@@ -178,6 +178,7 @@ fitGlmnetModel <- function(response,varsInModel,data,lambda=NULL,family="binomia
   return(list(fit=fit,prediction=prediction,error=error,penalty=fit$lambda))
 }
 
+#A function for the main model fit plot
 mainPlotFunction <- function(xVar=NULL,yVar=NULL,facetX=NULL,facetY=NULL,response=NULL,data,predictions) {
   #Constructing data set for the plot
   tempData <- data[,which(names(data) %in% c(xVar,yVar,facetX,facetY,response))]
@@ -281,6 +282,7 @@ mainPlotFunction <- function(xVar=NULL,yVar=NULL,facetX=NULL,facetY=NULL,respons
   return(ggPlot)
 }
 
+#A function for plotting the ROC.
 plotROC <- function(response,predictions,data) {
   require(pROC)
   commandROC <- paste("with(data,roc(",response,"~predictions))")
@@ -288,6 +290,7 @@ plotROC <- function(response,predictions,data) {
   return(plot(smooth(rocObject),main=paste("Area Under the Curve:",rocObject$auc)))
 }
 
+#A function for plotting the cross validation plot 
 plotCV <- function(fit) {
   if(is.null(fit)) return(NULL)
   return(plot(fit))
