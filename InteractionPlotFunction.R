@@ -81,7 +81,9 @@ interactionPlot <- function(varsInModel,data,error) {
 mainEffectPlot <- function(allVariables,varsInModel,response,data,error=NULL) {
   if(is.null(allVariables)) {
     stupidData <- data.frame(a=1:3,b=1:3)
-    stupidGGVIS <- ggvis(data=stupidData,x=~a,y=~b,opacity=0) %>% layer_points()
+    stupidGGVIS <- ggvis(data=stupidData,x=~a,y=~b,opacity=0) %>% 
+      layer_points() %>%
+      set_options(keep_aspect=TRUE,resizable=TRUE)
     return(stupidGGVIS)
   }
   
