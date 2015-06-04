@@ -132,6 +132,7 @@ mainEffectPlot <- function(allVariables,varsInModel,response,data,error=NULL) {
   correlations$zeros <- rep(0,nrow(correlations))
   correlations$absCorrelation <- abs(correlations$correlation) 
   
+  print(allVariables)
   ggvisPlot <- ggvis(data=correlations,x=~variable,y=~absCorrelation,fill:=~def.color,key:=~id) %>% 
     layer_points(size:=5000/length(allVariables),fillOpacity=0.75,fillOpacity.hover=1) %>%
     #layer_rects(width=band()) %>%
