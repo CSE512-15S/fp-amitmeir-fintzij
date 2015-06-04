@@ -331,8 +331,8 @@ plotCV <- function(fit) {
 # mainPlotFunction(xVar="Sepal.Length",yVar="Petal.Width",facetX="facx",facetY="facy",response="response",data,predictions)
 # 
 # plotROC(response,predictions,data)
-# 
-# 
+
+
 
 
 
