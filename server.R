@@ -74,8 +74,9 @@ shinyServer(function(input, output, session) {
   })
   
   variables <- reactiveValues(allVars = NULL,
-                              responseVar = NULL,
+                              responseVar = isolate(input$response),
                               predictorVars = NULL,
+                              interactionVars = NULL,
                               varsInModel = NULL)
   
   fittedmod <- reactiveValues(fit = NULL,
@@ -86,7 +87,7 @@ shinyServer(function(input, output, session) {
   observe({
     
     variables$allVars <- names(inputData())
-    variables$responseVar <- input$response 
+    variables$responseVar <- input$response
     variables$predictorVars <- setdiff(variables$allVars, variables$responseVar)
     
   })
@@ -95,9 +96,25 @@ shinyServer(function(input, output, session) {
     
     predictors <- variables$predictorVars
     
-    selectizeInput("maineffects", label = NULL, choices = predictors, multiple = TRUE)
+    selectizeInput("maineffects", label = "Main Effects", choices = predictors, multiple = TRUE)
     
   })
+  
+#   output$interactions <- renderUI({
+#     
+#     predictors <- input$maineffects
+#     
+#     if(length(predictors)<1){
+#       
+#       NULL
+#       
+#     } else{
+#      
+#       
+#        
+#     }
+#     
+#   })
   
   
   
@@ -133,7 +150,7 @@ shinyServer(function(input, output, session) {
   # printresponse
   output$printresponse <- renderPrint({
     
-    responsevar <- isolate(variables$responseVar)
+    responsevar <- variables$response
     
     cat(responsevar)
     

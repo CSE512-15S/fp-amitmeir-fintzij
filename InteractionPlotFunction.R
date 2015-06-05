@@ -82,8 +82,7 @@ mainEffectPlot <- function(allVariables,varsInModel,response,data,error=NULL) {
     stupidData <- data.frame(a=1:3,b=1:3)
     stupidGGVIS <- ggvis(data=stupidData,x=~a,y=~b,opacity=0) %>% 
       layer_points() %>%
-      set_options(height = 100, keep_aspect=TRUE,resizable=TRUE)  %>%
-      bind_shiny("ggvisMainEffect")
+      set_options(height = 100, keep_aspect=TRUE,resizable=TRUE)
     return(stupidGGVIS)
   }
   
@@ -152,8 +151,7 @@ mainEffectPlot <- function(allVariables,varsInModel,response,data,error=NULL) {
     add_tooltip(interactionToolTip, "hover") %>%
     add_tooltip(clickToolTip,"click") %>%
     layer_points(x:=0,y=1,opacity=0) %>% #For setting axes limits
-    set_options(height = 200, keep_aspect=TRUE, resizable=TRUE) %>%
-    bind_shiny("ggvisMainEffect")
+    set_options(height = 200, keep_aspect=TRUE, resizable=TRUE)
   
   return(ggvisPlot)
 }
@@ -375,6 +373,6 @@ plotCV <- function(fit) {
 # data$facy <- rbinom(nrow(data),1,0.5)
 # mainPlotFunction(xVar="Sepal.Length",yVar="Petal.Width",facetX="Petal.Length",facetY=NULL,response="is.virginica",data,predictions)
 # 
-par(mfrow=c(1,2),mar=rep(4,4))
-plotROC(response,predictions,data)
-plot(fit$lambda,fit$cvlo,main="Cross Validation Results")
+# par(mfrow=c(1,2),mar=rep(4,4))
+# plotROC(response,predictions,data)
+# plot(fit$lambda,fit$cvlo,main="Cross Validation Results")

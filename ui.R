@@ -4,9 +4,9 @@ library(ggvis)
 library(glmnet)
 library(magrittr)
 
-shinyUI(navbarPage("Exploratory binary classifier construction",
+shinyUI(navbarPage(h3("Exploratory binary classifier construction"),
                    
-        tabPanel("Upload and view data",
+        tabPanel(submitButton(text = h4("Upload and view data")),
              sidebarLayout(
                sidebarPanel(fileInput('dataset', 'Upload dataset with at least one binary response:',
                                       accept = c(
@@ -43,7 +43,7 @@ shinyUI(navbarPage("Exploratory binary classifier construction",
                               )
                )
              ),
-        tabPanel("Classifier construction",
+        tabPanel(submitButton(text = h4("Classifier construction")),
                  fluidRow(
                    column(2,
                           selectizeInput("classifier", 
@@ -51,52 +51,29 @@ shinyUI(navbarPage("Exploratory binary classifier construction",
                                          choices = list("Logistic L1 regression" = "logit",
                                                         "Linear L1 regression" = "linear")),
                           renderUI("penalty")),
-                   column(3,
+                   column(2,
                           h4("Select model varables"),
                           uiOutput("maineffects"),
                           uiOutput("interactions")
                           ),
                    column(1,
-                          submitButton(text = "Fit model", icon = icon("beer"))
-                          ),
-                   column(6,
+                          submitButton(text = "Fit model", icon = icon("beer"))                          ),
+                   column(7,
                           uiOutput("vismargins")
                           )
                  ),
                  fluidRow(
-                   column(6,
+                   column(5,
                           h3("Variable selection"),
                           hr(),
-                          ggvisOutput("ggvisMainEffect"),
+                          ggvisOutput("mainEffectsPlot"),
                           ggvisOutput("interactionplot")
                             ),
-                   column(6,
+                   column(7,
                           h3("Boundary visualization"),
                    hr(),
                    h4("Visualization settings"))
                    )
                  ),
-#         tabPanel("Classifier construction",
-#                  sidebarLayout(
-#                    sidebarPanel(
-#                      h3("Select classifier"),
-#                      selectizeInput("classifier", 
-#                                     "", 
-#                                     choices = list("Logistic regression" = "logit",
-#                                                 "Penalized logistic regression" = "pen_logit")),
-# #                      hr(),
-# #                      
-# #                      h3("Classifier parameters"),
-# #                      uiOutput("variables"),
-#                      uiOutput("tuning_params"),
-#                      
-#                      hr(),
-#                      
-#                      h3("Visualization settings"),
-#                      uiOutput("vismargins")
-#                      ),
-#                    mainPanel(
-#                      )
-#                    )),
-        tabPanel("Classifier performance")
+        tabPanel(submitButton(text = h4("Classifier performance")))
         ))
