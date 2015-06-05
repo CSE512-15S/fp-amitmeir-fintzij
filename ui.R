@@ -6,7 +6,7 @@ library(magrittr)
 
 shinyUI(navbarPage(h3("Exploratory binary classifier construction"),
                    
-        tabPanel(submitButton(text = h4("Upload and view data")),
+        tabPanel(actionButton("uploadButton" , label = h4("Upload and view data")),
              sidebarLayout(
                sidebarPanel(fileInput('dataset', 'Upload dataset with at least one binary response:',
                                       accept = c(
@@ -43,7 +43,7 @@ shinyUI(navbarPage(h3("Exploratory binary classifier construction"),
                               )
                )
              ),
-        tabPanel(submitButton(text = h4("Classifier construction")),
+        tabPanel(actionButton("constructionButton" , label = h4("Classifier construction")),
                  fluidRow(
                    column(2,
                           selectizeInput("classifier", 
@@ -57,7 +57,7 @@ shinyUI(navbarPage(h3("Exploratory binary classifier construction"),
                           uiOutput("interactions")
                           ),
                    column(1,
-                          submitButton(text = "Fit model", icon = icon("beer"))                          ),
+                          actionButton("fitButton", label = "Fit model", icon = icon("beer"))                          ),
                    column(7,
                           uiOutput("vismargins")
                           )
@@ -75,5 +75,5 @@ shinyUI(navbarPage(h3("Exploratory binary classifier construction"),
                    h4("Visualization settings"))
                    )
                  ),
-        tabPanel(submitButton(text = h4("Classifier performance")))
+        tabPanel(actionButton("performanceButton", label = h4("Classifier performance")))
         ))

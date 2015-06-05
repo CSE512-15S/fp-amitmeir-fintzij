@@ -58,6 +58,8 @@ shinyServer(function(input, output, session) {
   
   output$response <- renderUI({
     
+    input$constructionButton
+    
     # get dataset
     inFile <- inputData()
     
@@ -74,7 +76,7 @@ shinyServer(function(input, output, session) {
   })
   
   variables <- reactiveValues(allVars = NULL,
-                              responseVar = isolate(input$response),
+                              responseVar = NULL,
                               predictorVars = NULL,
                               interactionVars = NULL,
                               varsInModel = NULL)
@@ -83,6 +85,7 @@ shinyServer(function(input, output, session) {
                               prediction = NULL,
                               error = NULL,
                               penalty = isolate(input$lambda))
+  
   
   observe({
     
