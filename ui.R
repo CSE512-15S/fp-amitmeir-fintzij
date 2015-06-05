@@ -45,27 +45,30 @@ shinyUI(navbarPage("Exploratory binary classifier construction",
              ),
         tabPanel("Classifier construction",
                  fluidRow(
-                   column(3,
+                   column(2,
                           selectizeInput("classifier", 
                                          h4("Select classifier"),
                                          choices = list("Logistic L1 regression" = "logit",
-                                                        "Linear L1 regression" = "linear"))),
+                                                        "Linear L1 regression" = "linear")),
+                          renderUI("penalty")),
                    column(3,
-                          numericInput("lambda", label = h4("Penalty"), value = 0)
+                          h4("Select model varables"),
+                          uiOutput("maineffects"),
+                          uiOutput("interactions")
+                          ),
+                   column(1,
+                          submitButton(text = "Fit model", icon = icon("beer"))
                           ),
                    column(6,
-                          strong("Response: "), em(textOutput("printresponse", inline = T)),
-                          br(),
-                          strong("Predictors: "), em(textOutput("printpreds", inline = T))
+                          uiOutput("vismargins")
                           )
                  ),
                  fluidRow(
                    column(6,
                           h3("Variable selection"),
                           hr(),
-                          ggvisOutput("mainEffectsPlot"),
-                          ggvisOutput("interactionplot"),
-                          textOutput("printlambda")
+                          ggvisOutput("ggvisMainEffect"),
+                          ggvisOutput("interactionplot")
                             ),
                    column(6,
                           h3("Boundary visualization"),

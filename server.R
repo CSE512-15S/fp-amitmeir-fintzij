@@ -16,7 +16,7 @@ shinyServer(function(input, output, session) {
     # 'size', 'type', and 'datapath' columns. The 'datapath'
     # column will contain the local filenames where the data can be found.
     inFile <- input$dataset
-
+    
     if(!is.null(inFile)){
       dat <- read.csv(inFile$datapath, header = input$header, sep = input$sep, quote = input$quote)
       
@@ -29,9 +29,9 @@ shinyServer(function(input, output, session) {
     }
     
     return(dat)
-
-  })
     
+  })
+  
   # code for mutually exclusive selection of predictors and response
   
   # server function to render the data table          
@@ -52,7 +52,7 @@ shinyServer(function(input, output, session) {
     summary(dataset)
     
   })
-
+  
   
   # selectizeInput for variable selection UI 
   
@@ -87,8 +87,18 @@ shinyServer(function(input, output, session) {
     
     variables$allVars <- names(inputData())
     variables$responseVar <- input$response 
-    variables$predictorVars <- setdiff(isolate(variables$allVars), isolate(variables$responseVar))
+    variables$predictorVars <- setdiff(variables$allVars, variables$responseVar)
+    
   })
+  
+  output$maineffects <- renderUI({
+    
+    predictors <- variables$predictorVars
+    
+    selectizeInput("maineffects", label = NULL, choices = predictors, multiple = TRUE)
+    
+  })
+  
   
   
   model <- reactive({
@@ -108,10 +118,10 @@ shinyServer(function(input, output, session) {
     fittedmod$responseVar <- fitmod$prediction
     fittedmod$error <- fitmod$error
     fittedmod$penalty <- fitmod$penalty
-
+    
   })
   
-
+  
   output$printlambda <- renderText({
     
     fittedmod <- model()
@@ -170,7 +180,7 @@ shinyServer(function(input, output, session) {
   output$vismargins <- renderUI({
     
     # extract variable names
-    predic_vars <- input$predictors
+    predic_vars <- variables$predictorVars
     
     # generate selectizeInputs
     list(
@@ -184,10 +194,10 @@ shinyServer(function(input, output, session) {
   ##
   # REACTIVE VALUES :
   S <- reactiveValues(oldvar1vis=0, oldvar2vis=0) 
-
+  
   # REACTIVE VALUES :
   UV <- reactiveValues(var1vis=NULL,  var2vis=NULL, count=0)
-
+  
   observe({
     if(!is.null(UV$var1vis) && !is.null(UV$var2vis)) UV$count <- isolate(UV$count) + any(UV$var1vis==UV$var2vis)
   })
