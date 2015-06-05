@@ -2,12 +2,19 @@ require(pROC)
 
 #A function for creating the interaction interface plot
 interactionPlot <- function(varsInModel,data,error) {
-  if(length(varsInModel)==0) {
-    stupidData <- data.frame(a=1:3,b=1:3)
-    stupidGGVIS <- ggvis(data=stupidData,x=~a,y=~b,opacity=0) %>% layer_points()  %>%
-      set_options(keep_aspect=TRUE,resizable=TRUE)
-    return(stupidGGVIS)
-  }
+#   #### GGVIS COMMAND
+#   if(length(varsInModel)==0) {
+#     stupidData <- data.frame(a=1:3,b=1:3)
+#     stupidGGVIS <- ggvis(data=stupidData,x=~a,y=~b,opacity=0) %>% layer_points()  %>%
+#       set_options(keep_aspect=TRUE,resizable=TRUE)
+#     return(stupidGGVIS)
+#   }
+  
+    if(length(varsInModel)==0) {
+      stupidData <- data.frame(a=1:3,b=1:3)
+      stupidGGplot <- ggplot(stupidData) + geom_point(aes(x=a,y=b))
+      return(stupidGGplot)
+    }
   
   #Computing correlations with error
   varsInModel <- sort(varsInModel)
@@ -27,64 +34,83 @@ interactionPlot <- function(varsInModel,data,error) {
     }
   }
   
-  #interactions[,3] <- runif(min=-1,max=1,nrow(interactions))
+  interactions[,3] <- runif(min=-1,max=1,nrow(interactions))
   
   interactions$roundCor <- round(interactions$errorCorrelation,2)
-  
-  ##Setting up correlations colors
-  Blue = colorRampPalette(c("blue","grey"))
-  Red = colorRampPalette(c("grey","red"))
-  
-  # Negative values of defense get a blue color scale with 10 colors
-  interactions$def.color[interactions$roundCor<0] = 
-    as.character(cut(interactions$roundCor[interactions$roundCor<0], 
-                     seq(-1.1, 0, length.out=21), 
-                     labels=Blue(20)))
-  
-  # Positive values of defense get an orange color scale with 10 colors
-  interactions$def.color[interactions$roundCor>=0] = 
-    as.character(cut(interactions$roundCor[interactions$roundCor>=0], 
-                     seq(-0.1,1.1,length.out=21), 
-                     labels=Red(20)))
-  
-  #tooltip function
-  interactionToolTip <- function(x) {
-    if(is.null(x)) return(NULL)
-    row <- interactions[interactions$id == x$id, ]
-    paste(row$var1,"X",row$var2,"\n","Error Correlation: ",round(row$errorCorrelation,2))
-  }
-  
-  clickToolTip <- function(x) {
-    if(is.null(x)) return(NULL)
-    row <- interactions[interactions$id == x$id,1:2]
-    return(row)
-  }
-  
-  interactions$id <- 1:nrow(interactions)
   interactions$errorCorRound2 <- round(interactions$errorCorrelation,2)
   
-  ggvisPlot <- ggvis(data=interactions,x=~var1,y=~var2,fill:=~def.color,key:=~id) %>% 
-    layer_rects(width=band(),height=band(),fillOpacity:=0.8,fillOpacity.hover:=1) %>% 
-    layer_text(text:=~errorCorRound2, stroke:="black",fill:="white", align:="left", baseline:="top",fontSize:=100/length(varsInModel)) %>%
-    scale_nominal("x", padding = 0, points = FALSE) %>% 
-    scale_nominal("y", padding = 0, points = FALSE) %>%
-    add_tooltip(interactionToolTip, "hover") %>%
-    add_tooltip(clickToolTip,"click") %>%
-    bind_shiny("ggvisInteraction")
+  interactionPlot <- ggplot(interactions) + 
+    geom_tile(aes(x=var1,y=var2,fill=errorCorrelation)) +
+    theme_bw() + 
+    scale_fill_gradient2(limits=c(-1,1),low="blue",midpoint=0, high="red") +
+    geom_text(aes(x=var1,y=var2,label=paste(var1,"\n",var2,"\n",errorCorRound2)),size=15/length(varsInModel))
   
-  ggvisPlot
-  return(ggvisPlot)
+  return(interactionPlot)
+  
+  ############## GGVIS Part ##############
+#   
+#   ##Setting up correlations colors
+#   Blue = colorRampPalette(c("blue","grey"))
+#   Red = colorRampPalette(c("grey","red"))
+#   
+#   # Negative values of defense get a blue color scale with 10 colors
+#   interactions$def.color[interactions$roundCor<0] = 
+#     as.character(cut(interactions$roundCor[interactions$roundCor<0], 
+#                      seq(-1.1, 0, length.out=21), 
+#                      labels=Blue(20)))
+#   
+#   # Positive values of defense get an orange color scale with 10 colors
+#   interactions$def.color[interactions$roundCor>=0] = 
+#     as.character(cut(interactions$roundCor[interactions$roundCor>=0], 
+#                      seq(-0.1,1.1,length.out=21), 
+#                      labels=Red(20)))
+#   
+#   #tooltip function
+#   interactionToolTip <- function(x) {
+#     if(is.null(x)) return(NULL)
+#     row <- interactions[interactions$id == x$id, ]
+#     paste(row$var1,"X",row$var2,"\n","Error Correlation: ",round(row$errorCorrelation,2))
+#   }
+#   
+#   clickToolTip <- function(x) {
+#     if(is.null(x)) return(NULL)
+#     row <- interactions[interactions$id == x$id,1:2]
+#     return(row)
+#   }
+#   
+#   interactions$id <- 1:nrow(interactions)
+#   
+#   ggvisPlot <- ggvis(data=interactions,x=~var1,y=~var2,fill:=~def.color,key:=~id) %>% 
+#     layer_rects(width=band(),height=band(),fillOpacity:=0.8,fillOpacity.hover:=1) %>% 
+#     layer_text(text:=~errorCorRound2, stroke:="black",fill:="white", align:="left", baseline:="top",fontSize:=100/length(varsInModel)) %>%
+#     scale_nominal("x", padding = 0, points = FALSE) %>% 
+#     scale_nominal("y", padding = 0, points = FALSE) %>%
+#     add_tooltip(interactionToolTip, "hover") %>%
+#     add_tooltip(clickToolTip,"click") %>%
+#     bind_shiny("ggvisInteraction")
+#   
+#   ggvisPlot
+#   return(ggvisPlot)
 }
 
 #A function for creating the main effect interface plot
 mainEffectPlot <- function(allVariables,varsInModel,response,data,error=NULL) {
+  ### Stupid GGVIS
+#   if(is.null(allVariables)) {
+#     stupidData <- data.frame(a=1:3,b=1:3)
+#     stupidGGVIS <- ggvis(data=stupidData,x=~a,y=~b,opacity=0) %>% 
+#       layer_points() %>%
+#       set_options(height = 100, keep_aspect=TRUE,resizable=TRUE)  %>%
+#       bind_shiny("ggvisMainEffect")
+#     return(stupidGGVIS)
+#   }
+  
+  #Stupid ggplot
   if(is.null(allVariables)) {
     stupidData <- data.frame(a=1:3,b=1:3)
-    stupidGGVIS <- ggvis(data=stupidData,x=~a,y=~b,opacity=0) %>% 
-      layer_points() %>%
-      set_options(height = 100, keep_aspect=TRUE,resizable=TRUE)  %>%
-      bind_shiny("ggvisMainEffect")
-    return(stupidGGVIS)
+    stupidGGPLOT <- ggplot(data=stupidData,aes(x=a,y=b),alpha=0)  +
+      geom_point() + theme_bw()
+    return(stupidGGPLOT)
   }
   
   #Computing correlations
@@ -107,55 +133,65 @@ mainEffectPlot <- function(allVariables,varsInModel,response,data,error=NULL) {
   
   correlations$roundCor <- round(correlations$correlation,2)
   
-  Blue = colorRampPalette(c("blue","grey"))
-  Red = colorRampPalette(c("grey","red"))
-  black = colorRampPalette("black")
+  mainEffectPlot <- ggplot(correlations) +
+    geom_point(aes(x=variable,y=correlation,color=correlation),size=50/length(allVariables)) + 
+    theme_bw() + scale_y_continuous(limits=c(-1,1)) + 
+    geom_hline(x=0) + 
+    scale_color_gradient2(low="blue",mid="lightGrey",high="red",limits=c(-1,1))
+    
+  return(mainEffectPlot)
   
-  # Negative values of defense get a blue color scale with 10 colors
-  correlations$def.color[correlations$roundCor<0] = 
-    as.character(cut(correlations$roundCor[correlations$roundCor<0], 
-                     seq(-1.1, 0, length.out=21), 
-                     labels=Blue(20)))
   
-  # Positive values of defense get an orange color scale with 10 colors
-  correlations$def.color[correlations$roundCor>=0] = 
-    as.character(cut(correlations$roundCor[correlations$roundCor>=0], 
-                     seq(-0.1,1.1,length.out=21), 
-                     labels=Red(20)))
-  
-  correlations$def.color[which(allVariables %in% varsInModel)] <- "#0000"
-  
-  #tooltip function
-  interactionToolTip <- function(x) {
-    if(is.null(x)) return(NULL)
-    row <- correlations[correlations$id == x$id, ]
-    paste(row$variable,": ",round(row$correlation,2),sep="")
-  }
-  
-  clickToolTip <- function(x) {
-    if(is.null(x)) return(NULL)
-    row <- correlations[correlations$id == x$id, ]
-    print(as.character(row$variable))
-    return(NULL)
-  }
-  
-  correlations$id <- 1:nrow(correlations)
-  correlations$zeros <- rep(0,nrow(correlations))
-  correlations$absCorrelation <- correlations$correlation 
-  
-  ggvisPlot <- ggvis(data=correlations,x=~variable,y=~absCorrelation,fill:=~def.color,key:=~id) %>% 
-    layer_points(size:=1000/length(allVariables), shape := "diamond", fillOpacity=0.75,fillOpacity.hover=1) %>%
-    add_axis("x", title = "Variable") %>%
-    add_axis("y", title = "Correlation") %>%
-    scale_numeric("y", domain = c(-1, 1), nice = TRUE) %>%
-    #layer_rects(width=band()) %>%
-    add_tooltip(interactionToolTip, "hover") %>%
-    add_tooltip(clickToolTip,"click") %>%
-    layer_points(x:=0,y=1,opacity=0) %>% #For setting axes limits
-    set_options(height = 200, keep_aspect=TRUE, resizable=TRUE) %>%
-    bind_shiny("ggvisMainEffect")
-  
-  return(ggvisPlot)
+  ####### GGVIS COMMANDS
+#   Blue = colorRampPalette(c("blue","grey"))
+#   Red = colorRampPalette(c("grey","red"))
+#   black = colorRampPalette("black")
+#   
+#   # Negative values of defense get a blue color scale with 10 colors
+#   correlations$def.color[correlations$roundCor<0] = 
+#     as.character(cut(correlations$roundCor[correlations$roundCor<0], 
+#                      seq(-1.1, 0, length.out=21), 
+#                      labels=Blue(20)))
+#   
+#   # Positive values of defense get an orange color scale with 10 colors
+#   correlations$def.color[correlations$roundCor>=0] = 
+#     as.character(cut(correlations$roundCor[correlations$roundCor>=0], 
+#                      seq(-0.1,1.1,length.out=21), 
+#                      labels=Red(20)))
+#   
+#   correlations$def.color[which(allVariables %in% varsInModel)] <- "#0000"
+#   
+#   #tooltip function
+#   interactionToolTip <- function(x) {
+#     if(is.null(x)) return(NULL)
+#     row <- correlations[correlations$id == x$id, ]
+#     paste(row$variable,": ",round(row$correlation,2),sep="")
+#   }
+#   
+#   clickToolTip <- function(x) {
+#     if(is.null(x)) return(NULL)
+#     row <- correlations[correlations$id == x$id, ]
+#     print(as.character(row$variable))
+#     return(NULL)
+#   }
+#   
+#   correlations$id <- 1:nrow(correlations)
+#   correlations$zeros <- rep(0,nrow(correlations))
+#   correlations$absCorrelation <- correlations$correlation 
+#   
+#   ggvisPlot <- ggvis(data=correlations,x=~variable,y=~absCorrelation,fill:=~def.color,key:=~id) %>% 
+#     layer_points(size:=1000/length(allVariables), shape := "diamond", fillOpacity=0.75,fillOpacity.hover=1) %>%
+#     add_axis("x", title = "Variable") %>%
+#     add_axis("y", title = "Correlation") %>%
+#     scale_numeric("y", domain = c(-1, 1), nice = TRUE) %>%
+#     #layer_rects(width=band()) %>%
+#     add_tooltip(interactionToolTip, "hover") %>%
+#     add_tooltip(clickToolTip,"click") %>%
+#     layer_points(x:=0,y=1,opacity=0) %>% #For setting axes limits
+#     set_options(height = 200, keep_aspect=TRUE, resizable=TRUE) %>%
+#     bind_shiny("ggvisMainEffect")
+#   
+#   return(ggvisPlot)
 }
 
 #A function for fitting a glmnet model
@@ -174,6 +210,7 @@ fitGlmnetModel <- function(response,varsInModel,data,lambda=NULL,family="binomia
   #If only one predictor don't regularize
   if(length(varsInModel)==1) {
     commandFitIntercept <- paste("glm(",response,"~ ",varsInModel[1],",family=",family,",data=data)")
+    fit <- eval(parse(text=commandFitIntercept))
     predictions <- predict(fit,type="response")
     commandErrors <- paste("with(data,predictions-",response,")")
     errors <- eval(parse(text=commandErrors))
@@ -374,7 +411,7 @@ plotCV <- function(fit) {
 # data$facx <- rbinom(nrow(data),1,0.5)
 # data$facy <- rbinom(nrow(data),1,0.5)
 # mainPlotFunction(xVar="Sepal.Length",yVar="Petal.Width",facetX="Petal.Length",facetY=NULL,response="is.virginica",data,predictions)
-# 
-par(mfrow=c(1,2),mar=rep(4,4))
-plotROC(response,predictions,data)
-plot(fit$lambda,fit$cvlo,main="Cross Validation Results")
+# # 
+# par(mfrow=c(1,2),mar=rep(4,4))
+# plotROC(response,predictions,data)
+# plot(fit)
