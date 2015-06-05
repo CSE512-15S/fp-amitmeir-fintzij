@@ -365,16 +365,16 @@ plotCV <- function(fit) {
 # 
 # plotROC(response,predictions,data)
 
-result <- fitGlmnetModel(response,varsInModel,data,lambda=NULL,family='binomial')
-fit <- result$fit
-error <- result$error
-predictions <- result$prediction
-interactionPlot(varsInModel,data,error)
-mainEffectPlot(allVariables,varsInModel,response,data,error=error)
-data$facx <- rbinom(nrow(data),1,0.5)
-data$facy <- rbinom(nrow(data),1,0.5)
-mainPlotFunction(xVar="Sepal.Length",yVar="Petal.Width",facetX="Petal.Length",facetY=NULL,response="is.virginica",data,predictions)
-
+# result <- fitGlmnetModel(response,varsInModel,data,lambda=NULL,family='binomial')
+# fit <- result$fit
+# error <- result$error
+# predictions <- result$prediction
+# interactionPlot(varsInModel,data,error)
+# mainEffectPlot(allVariables,varsInModel,response,data,error=error)
+# data$facx <- rbinom(nrow(data),1,0.5)
+# data$facy <- rbinom(nrow(data),1,0.5)
+# mainPlotFunction(xVar="Sepal.Length",yVar="Petal.Width",facetX="Petal.Length",facetY=NULL,response="is.virginica",data,predictions)
+# 
 par(mfrow=c(1,2),mar=rep(4,4))
 plotROC(response,predictions,data)
-plot(fit$Lambda,fit$lambda1se,main="Cross Validation Results")
+plot(fit$lambda,fit$cvlo,main="Cross Validation Results")
