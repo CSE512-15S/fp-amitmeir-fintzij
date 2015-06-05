@@ -5,7 +5,7 @@ library(glmnet)
 library(magrittr)
 
 shinyUI(navbarPage(h3("Exploratory binary classifier construction"),
-                   
+         # upload panel
         tabPanel(actionButton("uploadButton" , label = h4("Upload and view data")),
              sidebarLayout(
                sidebarPanel(fileInput('dataset', 'Upload dataset with at least one binary response:',
@@ -43,6 +43,8 @@ shinyUI(navbarPage(h3("Exploratory binary classifier construction"),
                               )
                )
              ),
+        
+        # construction panel
         tabPanel(actionButton("constructionButton" , label = h4("Classifier construction")),
                  fluidRow(
                    column(2,
@@ -57,7 +59,10 @@ shinyUI(navbarPage(h3("Exploratory binary classifier construction"),
                           uiOutput("interactions")
                           ),
                    column(1,
-                          actionButton("fitButton", label = "Fit model", icon = icon("beer"))                          ),
+                          actionButton("fitButton", label = "Fit model", icon = icon("beer")),
+                          textOutput("printpreds"),
+                          textOutput("printlambda")
+                          ),
                    column(7,
                           uiOutput("vismargins")
                           )

@@ -92,39 +92,27 @@ shinyServer(function(input, output, session) {
     variables$allVars <- names(inputData())
     variables$responseVar <- input$response
     variables$predictorVars <- setdiff(variables$allVars, variables$responseVar)
-    
+
   })
   
   output$maineffects <- renderUI({
     
-    predictors <- variables$predictorVars
-    
-    selectizeInput("maineffects", label = "Main Effects", choices = predictors, multiple = TRUE)
+    selectizeInput("maineffects", label = "Main Effects", choices = variables$predictorVars, multiple = TRUE)
     
   })
   
-#   output$interactions <- renderUI({
-#     
-#     predictors <- input$maineffects
-#     
-#     if(length(predictors)<1){
-#       
-#       NULL
-#       
-#     } else{
-#      
-#       
-#        
-#     }
-#     
-#   })
-  
+  observe({
+    
+    variables$varsInModel <- input$maineffects
+    
+  })
   
   
   model <- reactive({
+    
     dataset <- inputData()
-    responsevar <- isolate(variables$responseVar)
-    varsinmod <- isolate(variables$varsInModel)
+    responsevar <- variables$responseVar
+    varsinmod <- variables$varsInModel
     penalty <- fittedmod$penalty
     
     fitGlmnetModel(response = responsevar, varsInModel = varsinmod, lambda = penalty, data = dataset)
@@ -132,6 +120,7 @@ shinyServer(function(input, output, session) {
   })
   
   reactive({
+
     fitmod <- model()
     
     fittedmod$fit <- fitmod$fit
@@ -146,7 +135,7 @@ shinyServer(function(input, output, session) {
     
     fittedmod <- model()
     lambda <- isolate(fittedmod$penalty)
-    print(lambda)
+    lambda
     
   })
   
@@ -161,7 +150,7 @@ shinyServer(function(input, output, session) {
   
   output$printpreds <- renderPrint({
     
-    predvars <- isolate(variables$varsInModel)
+    predvars <- variables$varsInModel
     
     if(is.null(predvars)) predvars <- "None selected"
     
@@ -169,31 +158,37 @@ shinyServer(function(input, output, session) {
     
   })
   
-  # main effects plot
-  reactive({
-    
-    dat <- inputData()
-    
-    predictors <- variables$predictorVars
-    varsinmodel <- variables$varsInModel
-    responsevar <- variables$responseVar
-    error <- fittedmod$error
-    
-    mainEffectPlot(allVariables = predictors, varsInModel = varsinmodel, response = responsevar, data = dat, error=error)
-    
-  }) %>% bind_shiny("mainEffectsPlot")
   
+  # main effects plot
+#   maineffectsettings <- reactive({
+#     
+#     dat <- inputData()
+# 
+#     predictors <- variables$predictorVars
+#     varsinmodel <- variables$varsInModel
+#     responsevar <- variables$responseVar
+#     error <- fittedmod$error  
+#     
+#      mainEffectPlot(allVariables = predictors,
+#                     varsInModel = varsinmodel,
+#                     response = responsevar,
+#                     data = dat,
+#                     error=error)
+#     
+#     
+#   }) %>%  bind_shiny("mainEffectsPlot")
+#   
   # interactions plot
-  reactive({
-    
-    dat <- inputData()
-    
-    varsinmodel <- variables$varsInModel
-    err <- fittedmod$error
-    
-    interactionPlot(varsInModel = varsinmodel, data = dat, error = err)
-    
-  }) %>% bind_shiny("interactionplot")
+#   reactive({
+#     
+#     dat <- inputData()
+#     
+#     varsinmodel <- variables$varsInModel
+#     err <- fittedmod$error
+#     
+#     interactionPlot(varsInModel = varsinmodel, data = dat, error = err)
+#     
+#   }) %>% bind_shiny("interactionplot")
   
   
   # selectizeInput for plot margins
