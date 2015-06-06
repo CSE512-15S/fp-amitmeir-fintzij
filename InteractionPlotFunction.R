@@ -111,6 +111,10 @@ mainEffectPlot <- function(allVariables,varsInModel,response,data,error=NULL) {
     stupidGGPLOT <- ggplot(data=stupidData,aes(x=a,y=b),alpha=0)  +
       geom_point() + theme_bw()
     return(stupidGGPLOT)
+    stupidGGVIS <- ggvis(data=stupidData,x=~a,y=~b,opacity=0) %>% 
+      layer_points() %>%
+      set_options(height = 100, keep_aspect=TRUE,resizable=TRUE)
+    return(stupidGGVIS)
   }
   
   #Computing correlations
@@ -220,16 +224,28 @@ fitGlmnetModel <- function(response,varsInModel,data,lambda=NULL,family="binomia
     return(list(fit=fit,prediction=predictions,error=errors,penalty=lambda,optimal=lambda))
   }
   
+  # Identifty which variable is an interaction and which is a main effect
+  interactionInd <- sapply(varsInModel,function(x) grepl(":",x))
+  interactions <- varsInModel[which(interactionInd)]
+  main <- varsInModel[which(!interactionInd)]
+  interactionMatrix <- sapply(interactions,function(x) strsplit(x,":")[[1]]) 
+  interactionMatrix <- matrix(interactionMatrix,ncol=2)
+  
   require(glmnet)
   #Generating design matrix
   commandDesignMatrix <- "X <- model.frame(~1"
-  for(i in 1:length(varsInModel)) {
-    commandDesignMatrix <- paste(commandDesignMatrix,"+",varsInModel[i])
+  for(i in 1:length(main)) {
+    commandDesignMatrix <- paste(commandDesignMatrix,"+",main[i])
+  }
+  
+  for(i in 1:nrow(interactionMatrix)) {
+    commandDesignMatrix <- paste(commandDesignMatrix,"+I(",
+                                 interactionMatrix[i,1],"*",interactionMatrix[i,2],")")
   }
   commandDesignMatrix <- paste(commandDesignMatrix,",data=data)")
   eval(parse(text=commandDesignMatrix))
   
-  #Fitting Model 
+  #Fitting Model
   commandFitModel <- paste("fit <- cv.glmnet(y=data$",response,",x=as.matrix(X),family='",family,"')",sep="")
   eval(parse(text=commandFitModel))
   
