@@ -61,16 +61,24 @@ interactionPlot <- function(varsInModel,data,error) {
     }
     return(FALSE)
   }
-  inModel <- apply(interactions[,1:2],1,checkIfInInteractions,interactionMatrix)
+  if(nrow(interactionMatrix)>0) {
+    inModel <- apply(interactions[,1:2],1,checkIfInInteractions,interactionMatrix)
+  } else {
+    inModel <- rep(FALSE,nrow(interactions))
+  }
   
-  interactionPlot <- ggplot(interactions) + 
-    geom_tile(data=interactions[inModel,],aes(x=var1,y=var2,height=0.98,width=0.98),fill="black") +
-    geom_tile(aes(x=var1,y=var2,fill=errorCorrelation,height=0.92,width=0.92)) +
+  interactionPlot <- ggplot(interactions) 
+  if(nrow(interactionMatrix)>0) {
+    interactionPlot <- interactionPlot + 
+      geom_tile(data=interactions[inModel,],aes(x=var1,y=var2,height=0.98,width=0.98),fill="black") 
+  } 
+  interactionPlot <- interactionPlot + 
+    geom_tile(aes(x=var1,y=var2,fill=errorCorrelation,height=0.88,width=0.88)) +
     theme_bw() + 
     scale_fill_gradient2(limits=c(-1,1),low="blue",midpoint=0, high="red") +
     geom_text(aes(x=var1,y=var2,label=paste(var1,"\n",var2,"\n",errorCorRound2)),size=15/length(varsInModel)) +
     scale_x_discrete(expand=c(0.04,0.04)) + 
-    scale_y_discrete(expand=c(0.04,0.04))
+    scale_y_discrete(expand=c(0.04,0.04)) 
   
   return(interactionPlot)
   
