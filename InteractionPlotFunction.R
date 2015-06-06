@@ -243,10 +243,13 @@ fitGlmnetModel <- function(response,varsInModel,data,lambda=NULL,family="binomia
     commandDesignMatrix <- paste(commandDesignMatrix,"+",main[i])
   }
   
-  for(i in 1:nrow(interactionMatrix)) {
-    commandDesignMatrix <- paste(commandDesignMatrix,"+I(",
-                                 interactionMatrix[i,1],"*",interactionMatrix[i,2],")")
+  if(any(interactionInd)) {
+    for(i in 1:nrow(interactionMatrix)) {
+      commandDesignMatrix <- paste(commandDesignMatrix,"+I(",
+                                   interactionMatrix[i,1],"*",interactionMatrix[i,2],")")
+    }
   }
+
   commandDesignMatrix <- paste(commandDesignMatrix,",data=data)")
   eval(parse(text=commandDesignMatrix))
   
