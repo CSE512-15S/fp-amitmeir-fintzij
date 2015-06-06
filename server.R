@@ -1,15 +1,15 @@
 # server.R performs the server-side calculations for ui.R
 
 library(glmnet)
-library(ggvis)
+library(ggplot2)
 library(graphics)
 library(pROC)
 library(gam)
 source("InteractionPlotFunction.R")
 
 shinyServer(function(input, output, session) { 
-  # reactive expression for the dataset
   
+  # data upload tab stuff
   inputData <- reactive({
     # input$file1 will be NULL initially. After the user selects
     # and uploads a file, it will be a data frame with 'name',
@@ -73,6 +73,7 @@ shinyServer(function(input, output, session) {
     
   })
   
+  # Construction tab stuff
   variables <- reactiveValues(allVars = NULL,
                               responseVar = NULL,
                               predictorVars = NULL,
@@ -83,6 +84,7 @@ shinyServer(function(input, output, session) {
                               error = NULL,
                               penalty = isolate(input$lambda))
   
+  # observe dataset, allVars, response, and predictors
   observe({
     
     variables$allVars <- names(inputData())
@@ -92,6 +94,7 @@ shinyServer(function(input, output, session) {
 
   })
   
+  # selectizeInput for main effects
   output$maineffects <- renderUI({
     
     selectizeInput("maineffects", label = "Main Effects", choices = variables$predictorVars, multiple = TRUE)
@@ -100,38 +103,76 @@ shinyServer(function(input, output, session) {
   
   observe({
     
-    variables$varsInModel <- input$maineffects
+    maineffectsInMod <- isolate(input$maineffects)
+    
+    interactions <- rep(NA, length(maineffectsInMod) + choose(length(maineffectsInMod), 2))
+    
+    for(k in 1:length(maineffectsInMod)){
+      for(j in k:length(maineffectsInMod)){
+        
+        print(k*j + j + k)
+        # interactions[k + (k-1)*j] <- 0
+      }
+    }
+    
+  })
+  
+  observe({
+    
+    variables$varsInModel <- c(input$maineffects, input$interactions)
     
   })
   
   
-  model <- reactive({
+  model <- eventReactive(input$fitButton, {
     
     dataset <- inputData()
+    
     responsevar <- variables$responseVar
     varsinmod <- variables$varsInModel
-    penalty <- fittedmod$penalty
+    penalty <- input$penalty
     
     fitGlmnetModel(response = responsevar, varsInModel = varsinmod, lambda = penalty, data = dataset)
     
   })
   
-  reactive({
+  fitreactive <- reactive({
 
     fitmod <- model()
     
     fittedmod$fit <- fitmod$fit
-    fittedmod$responseVar <- fitmod$prediction
+    fittedmod$prediction <- fitmod$prediction
     fittedmod$error <- fitmod$error
     fittedmod$penalty <- fitmod$penalty
 
   })
   
 
+  # main effects plot
+  output$mainEffectsPlot <- renderPlot({
+    
+    fitreactive()
+    
+    predictors <- variables$predictorVars
+    varsinmodel <- variables$varsInModel
+    responsevar <- variables$responseVar
+    error <- fittedmod$error
+    
+    mainEffectPlot(allVariables = predictors,
+                   varsInModel = varsinmodel,
+                   response = responsevar,
+                   data = dat,
+                   error=error)
+    
+  })
+  
+  
+  
+  
   output$printlambda <- renderText({
     
     fittedmod <- model()
-    lambda <- isolate(fittedmod$penalty)
+    lambda <- isolate(fittedmod$error)
     lambda
     
   })
@@ -156,24 +197,7 @@ shinyServer(function(input, output, session) {
   })
   
   
-  # main effects plot
-#   maineffectsettings <- reactive({
-#     
-#     dat <- inputData()
-# 
-#     predictors <- variables$predictorVars
-#     varsinmodel <- variables$varsInModel
-#     responsevar <- variables$responseVar
-#     error <- fittedmod$error  
-#     
-#      mainEffectPlot(allVariables = predictors,
-#                     varsInModel = varsinmodel,
-#                     response = responsevar,
-#                     data = dat,
-#                     error=error)
-#     
-#     
-#   }) %>%  bind_shiny("mainEffectsPlot")
+  
 #   
   # interactions plot
 #   reactive({

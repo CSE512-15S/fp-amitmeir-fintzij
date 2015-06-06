@@ -1,6 +1,6 @@
 # ui.R - User interface for the data exploration and classifier construction tool
 
-library(ggvis)
+library(ggplot2)
 library(glmnet)
 library(magrittr)
 
@@ -50,8 +50,8 @@ shinyUI(navbarPage(h3("Exploratory binary classifier construction"),
                               column(2,
                                      selectizeInput("classifier", 
                                                     h4("Select classifier"),
-                                                    choices = list("Logistic L1 regression" = "logit",
-                                                                   "Linear L1 regression" = "linear")),
+                                                    choices = list("Penalized logistic regression" = "logit",
+                                                                   "Penalized linear regression" = "linear")),
                                      renderUI("penalty")),
                               column(2,
                                      h4("Select model varables"),
@@ -59,10 +59,9 @@ shinyUI(navbarPage(h3("Exploratory binary classifier construction"),
                                      uiOutput("interactions")
                               ),
                               column(1,
-                                     actionButton("fitButton", label = "Fit model", icon = icon("beer")),
-                                     textOutput("printpreds"),
-                                     textOutput("printlambda")
-                              ),
+                                     actionButton("fitButton", label = h4("Fit model"), icon = icon("beer")),
+                                     textOutput("printpreds")
+                                     ),
                               column(7,
                                      uiOutput("vismargins")
                               )
@@ -71,8 +70,8 @@ shinyUI(navbarPage(h3("Exploratory binary classifier construction"),
                               column(5,
                                      h3("Variable selection"),
                                      hr(),
-                                     ggvisOutput("mainEffectsPlot"),
-                                     ggvisOutput("interactionplot")
+                                     plotOutput("mainEffectsPlot", width = "100%", height = "300px"),
+                                     plotOutput("interactionplot")
                               ),
                               column(7,
                                      h3("Boundary visualization"),
