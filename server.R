@@ -82,8 +82,9 @@ shinyServer(function(input, output, session) {
   fittedmod <- reactiveValues(fit = NULL,
                               prediction = NULL,
                               error = NULL,
-                              penalty = isolate(input$lambda))
-  
+                              penalty = NULL,
+                              optimal = NULL)
+
   # observe dataset, allVars, response, and predictors
   observe({
     
@@ -155,8 +156,12 @@ shinyServer(function(input, output, session) {
     fittedmod$prediction <- fitmod$prediction
     fittedmod$error <- fitmod$error
     fittedmod$penalty <- fitmod$penalty
+    fittedmod$optimal <- fitmod$optimal
 
+    updateSliderInput(session, "penalty", value = fitmod$optimal, min = min(fitmod$penalty), max = max(fitmod$penalty))
   })
+  
+
   
 
   # main effects plot
@@ -190,12 +195,13 @@ shinyServer(function(input, output, session) {
     
   })
   
+  
 
   
-  output$printlambda <- renderText({
+  output$printpenalty <- renderText({
     
     fittedmod <- model()
-    lambda <- isolate(fittedmod$error)
+    lambda <- isolate(fittedmod$penalty)
     lambda
     
   })
