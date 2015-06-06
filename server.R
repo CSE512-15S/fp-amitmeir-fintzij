@@ -77,7 +77,8 @@ shinyServer(function(input, output, session) {
   variables <- reactiveValues(allVars = NULL,
                               responseVar = NULL,
                               predictorVars = NULL,
-                              varsInModel = NULL)
+                              varsInModel = NULL,
+                              oldVarsInModel = NULL)
   
   fittedmod <- reactiveValues(fit = NULL,
                               prediction = NULL,
@@ -156,12 +157,18 @@ shinyServer(function(input, output, session) {
     fittedmod$prediction <- fitmod$prediction
     fittedmod$error <- fitmod$error
     fittedmod$penalty <- fitmod$penalty
-    fittedmod$optimal <- fitmod$optimal
+    fittedmod$optimal <- fitmod$optimal    
 
-    updateSliderInput(session, "penalty", value = fitmod$optimal, min = min(fitmod$penalty), max = max(fitmod$penalty))
+    varsinmod <- variables$varsInModel
+    oldvarsinmod <- variables$oldVarsInModel
+    
+    if(!identical(varsinmod, oldvarsinmod)){
+      updateSliderInput(session, "penalty", value = fitmod$optimal, min = 0, max = 2*signif(max(fitmod$penalty),3), step = 0.001)
+      variables$oldVarsInModel <- varsinmod
+    }
+    
   })
   
-
   
 
   # main effects plot

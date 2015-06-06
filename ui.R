@@ -52,16 +52,18 @@ shinyUI(navbarPage("Exploratory binary classifier construction",
                                                     h4("Select classifier"),
                                                     choices = list("Penalized logistic regression" = "logit",
                                                                    "Penalized linear regression" = "linear")),
-                                     sliderInput("penalty", "Set L1 penalty parameter", 0, 0, 0)),
-                              column(2,
+                                     sliderInput("penalty", "Set L1 penalty parameter", min = 0, max = 0, value = 0,sep="", round = -3,step = 0.001),
+                                     actionButton("setoptimal", "Optimal penalty"),
+                                     br(), br(),
+                                     actionButton("fitButton", label = h4("Fit model"), icon = icon("beer")),
+                                     textOutput("printpreds")
+                                     ),
+                              column(3,
                                      h4("Select model varables"),
                                      uiOutput("maineffects"),
                                      uiOutput("interactions")
                               ),
-                              column(1,
-                                     actionButton("fitButton", label = h4("Fit model"), icon = icon("beer")),
-                                     textOutput("printpreds")
-                                     ),
+                              
                               column(2,
                                      h4("Margins and facets for boundary plot"),
                                      uiOutput("vismargins")
