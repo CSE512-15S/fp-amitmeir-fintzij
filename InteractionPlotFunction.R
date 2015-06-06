@@ -459,7 +459,7 @@ plotCV <- function(fit) {
 # mainEffectPlot(allVariables,varsInModel,response,data,error=error)
 # data$facx <- rbinom(nrow(data),1,0.5)
 # data$facy <- rbinom(nrow(data),1,0.5)
-# mainPlotFunction(xVar="Sepal.Length",yVar="Petal.Width",facetX="facx",facetY="facy",response="response",data,predictions)
+# mainPlotFunction(xVar="Sepal.Length",yVar="Petal.Width",facetX="facx",facetY="facy",response="is.virginica",data,predictions)
 # 
 # plotROC(response,predictions,data)
 
