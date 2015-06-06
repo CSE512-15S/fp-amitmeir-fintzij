@@ -48,39 +48,40 @@ shinyUI(navbarPage("Exploratory binary classifier construction",
                    tabPanel(actionButton("constructionButton" , label = h5("Classifier construction")),
                             fluidRow(
                               column(2,
+                                     h3("Select model varables"),
+                                     hr(),
                                      selectizeInput("classifier", 
                                                     h4("Select classifier"),
                                                     choices = list("Penalized logistic regression" = "logit",
                                                                    "Penalized linear regression" = "linear")),
                                      sliderInput("penalty", "Set L1 penalty parameter", min = 0, max = 0, value = 0,sep="", round = -3,step = 0.001),
                                      actionButton("setoptimal", "Optimal penalty"),
-                                     br(), br(),
-                                     actionButton("fitButton", label = h4("Fit model"), icon = icon("beer")),
+                                     br(), br(), br(),
                                      textOutput("printpreds")
                                      ),
                               column(3,
-                                     h4("Select model varables"),
+                                     actionButton("fitButton", label = h3("Fit model")),
+                                     br(), br(), br(),
                                      uiOutput("maineffects"),
                                      uiOutput("interactions")
                               ),
                               
                               column(2,
-                                     h4("Margins and facets for boundary plot"),
+                                     h3("Boundary visualization"),
+                                     hr(),
                                      uiOutput("vismargins")
                               ),
                               column(4,
-                                     actionButton("boundaryButton", label = h4("Plot boundary"))
+                                     actionButton("boundaryButton", label = h3("Plot boundary"))
                                      )
                             ),
                             fluidRow(
                               column(5,
-                                     h3("Variable selection"),
                                      hr(),
                                      plotOutput("mainEffectsPlot", width = "100%", height = "300px"),
                                      plotOutput("interactionplot")
                               ),
                               column(7,
-                                     h3("Boundary visualization"),
                                      hr(),
                                      plotOutput("boundaryplot")
                                      )
