@@ -117,6 +117,10 @@ mainEffectPlot <- function(allVariables,varsInModel,response,data,error=NULL) {
     return(stupidGGVIS)
   }
   
+  interactionInd <- sapply(varsInModel,function(x) grepl(":",x))
+  interactions <- varsInModel[which(interactionInd)]
+  main <- varsInModel[which(!interactionInd)]
+  
   #Computing correlations
   nVars <- length(allVariables)
   correlations <- data.frame(variable=allVariables,correlation=rep(nVars,nVars))
@@ -136,13 +140,14 @@ mainEffectPlot <- function(allVariables,varsInModel,response,data,error=NULL) {
   }
   
   correlations$roundCor <- round(correlations$correlation,2)
-  
+  inModel <- correlations$variable %in% main
 
   mainEffectPlot <- ggplot(correlations) +
-    geom_point(aes(x=variable,y=correlation,color=correlation),size=50/length(allVariables)) + 
+    geom_point(data=correlations[inModel,],aes(x=variable,y=correlation),shape=23,fill="black",size=65/length(allVariables)) + 
+    geom_point(aes(x=variable,y=correlation,fill=correlation),shape=23,size=50/length(allVariables)) + 
     theme_bw() + scale_y_continuous(limits=c(-1,1)) + 
     geom_hline(x=0) + 
-    scale_color_gradient2(low="blue",mid="lightGrey",high="red",limits=c(-1,1))
+    scale_fill_gradient2(low="blue",mid="lightGrey",high="red",limits=c(-1,1))
   
   return(mainEffectPlot)
   
