@@ -101,19 +101,30 @@ shinyServer(function(input, output, session) {
     
   })
   
+  output$interactions <- renderUI({
+    
+    selectizeInput("interactions", label = "Interactions", choices = NULL, selected = NULL, multiple = TRUE)
+    
+  })
+  
   observe({
     
-    maineffectsInMod <- isolate(input$maineffects)
+    maineffectsInMod <- input$maineffects
     
-    interactions <- rep(NA, length(maineffectsInMod) + choose(length(maineffectsInMod), 2))
+    interactionChoices <- rep(NA, length(maineffectsInMod) + choose(length(maineffectsInMod), 2))
+    
+    n <- 0
     
     for(k in 1:length(maineffectsInMod)){
       for(j in k:length(maineffectsInMod)){
         
-        print(k*j + j + k)
-        # interactions[k + (k-1)*j] <- 0
+        n <- n+1; print(n)
+        
+        interactionChoices[n] <- paste(maineffectsInMod[k],maineffectsInMod[j],sep=":")
       }
     }
+    
+    updateSelectizeInput(session, "interactions", choices = interactionChoices)
     
   })
   
@@ -166,7 +177,18 @@ shinyServer(function(input, output, session) {
     
   })
   
-  
+  output$interactionplot <- renderPlot({
+    
+    fitreactive()
+    
+    varsinmodel <- variables$varsInModel
+    error <- fittedmod$error
+    
+    interactionPlot(varsInModel = varsinmodel,
+                   data = dat,
+                   error=error)
+    
+  })
   
   
   output$printlambda <- renderText({
