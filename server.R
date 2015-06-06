@@ -184,7 +184,7 @@ shinyServer(function(input, output, session) {
     mainEffectPlot(allVariables = predictors,
                    varsInModel = varsinmodel,
                    response = responsevar,
-                   data = dat,
+                   data = inputData(),
                    error=error)
     
   })
@@ -197,7 +197,7 @@ shinyServer(function(input, output, session) {
     error <- fittedmod$error
     
     interactionPlot(varsInModel = varsinmodel,
-                   data = dat,
+                   data = inputData(),
                    error=error)
     
   })
