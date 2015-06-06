@@ -78,7 +78,10 @@ interactionPlot <- function(varsInModel,data,error) {
     scale_fill_gradient2(limits=c(-1,1),low="blue",midpoint=0, high="red") +
     geom_text(aes(x=var1,y=var2,label=paste(var1,"\n",var2,"\n",errorCorRound2)),size=15/length(varsInModel)) +
     scale_x_discrete(expand=c(0.04,0.04)) + 
-    scale_y_discrete(expand=c(0.04,0.04)) 
+    scale_y_discrete(expand=c(0.04,0.04)) + 
+    theme(axis.title.x = element_blank(),
+          axis.title.y = element_blank(),
+          axis.text = element_blank()) 
   
   return(interactionPlot)
   
@@ -182,7 +185,10 @@ mainEffectPlot <- function(allVariables,varsInModel,response,data,error=NULL) {
     geom_point(aes(x=variable,y=correlation,fill=correlation),shape=23,size=50/length(allVariables)) + 
     theme_bw() + scale_y_continuous(limits=c(-1,1)) + 
     geom_hline(x=0) + 
-    scale_fill_gradient2(low="blue",mid="lightGrey",high="red",limits=c(-1,1))
+    scale_fill_gradient2(low="blue",mid="lightGrey",high="red",limits=c(-1,1))+
+    theme(axis.title.x = element_blank(),
+          axis.title.y = element_blank(),
+          axis.text.x = element_text(angle = -45, vjust = 0.8, hjust = 0.05))
   
   return(mainEffectPlot)
   
