@@ -4,9 +4,9 @@ library(ggplot2)
 library(glmnet)
 library(magrittr)
 
-shinyUI(navbarPage(h3("Exploratory binary classifier construction"),
+shinyUI(navbarPage("Exploratory binary classifier construction",
                    # upload panel
-                   tabPanel(actionButton("uploadButton" , label = h4("Upload and view data")),
+                   tabPanel(actionButton("uploadButton" , label = h5("Upload and view data")),
                             sidebarLayout(
                               sidebarPanel(fileInput('dataset', 'Upload dataset with at least one binary response:',
                                                      accept = c(
@@ -45,7 +45,7 @@ shinyUI(navbarPage(h3("Exploratory binary classifier construction"),
                    ),
                    
                    # construction panel
-                   tabPanel(actionButton("constructionButton" , label = h4("Classifier construction")),
+                   tabPanel(actionButton("constructionButton" , label = h5("Classifier construction")),
                             fluidRow(
                               column(2,
                                      selectizeInput("classifier", 
@@ -62,9 +62,13 @@ shinyUI(navbarPage(h3("Exploratory binary classifier construction"),
                                      actionButton("fitButton", label = h4("Fit model"), icon = icon("beer")),
                                      textOutput("printpreds")
                                      ),
-                              column(7,
+                              column(2,
+                                     h4("Margins and facets for boundary plot"),
                                      uiOutput("vismargins")
-                              )
+                              ),
+                              column(4,
+                                     actionButton("plotboundary", label = h4("Plot boundary"))
+                                     )
                             ),
                             fluidRow(
                               column(5,
@@ -79,5 +83,5 @@ shinyUI(navbarPage(h3("Exploratory binary classifier construction"),
                                      h4("Visualization settings"))
                             )
                    ),
-                   tabPanel(actionButton("performanceButton", label = h4("Classifier performance")))
+                   tabPanel(actionButton("performanceButton", label = h5("Classifier performance")))
 ))

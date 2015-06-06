@@ -118,7 +118,7 @@ shinyServer(function(input, output, session) {
     for(k in 1:length(maineffectsInMod)){
       for(j in k:length(maineffectsInMod)){
         
-        n <- n+1; print(n)
+        n <- n+1
         
         interactionChoices[n] <- paste(maineffectsInMod[k],maineffectsInMod[j],sep=":")
       }
@@ -190,6 +190,7 @@ shinyServer(function(input, output, session) {
     
   })
   
+
   
   output$printlambda <- renderText({
     
@@ -219,89 +220,72 @@ shinyServer(function(input, output, session) {
   })
   
   
-  
-#   
-  # interactions plot
-#   reactive({
-#     
-#     dat <- inputData()
-#     
-#     varsinmodel <- variables$varsInModel
-#     err <- fittedmod$error
-#     
-#     interactionPlot(varsInModel = varsinmodel, data = dat, error = err)
-#     
-#   }) %>% bind_shiny("interactionplot")
-  
+
   
   # selectizeInput for plot margins
   output$vismargins <- renderUI({
     
     # extract variable names
-    predic_vars <- input$predictors
+    predic_vars <- variables$predictorVars
     
     # generate selectizeInputs
     list(
-      selectizeInput("var1vis", "Margin 1", choices = predic_vars),
-      selectizeInput("var2vis", "Margin 2", choices = predic_vars)
+      
+      selectizeInput("var1vis", "Margin 1", choices = c("Select margin 1", predic_vars)),
+      selectizeInput("var2vis", "Margin 2", choices = c("Select margin 2", predic_vars)),
+      selectizeInput("facet1", "Facet 1", choices = c("Select facet 1", predic_vars)),
+      selectizeInput("facet2", "Facet 2", choices = c("Select facet 2", predic_vars))
+      
     )
     
   })
   
-  # selction of margins for plotting
-  ##
-  # REACTIVE VALUES :
-  S <- reactiveValues(oldvar1vis=0, oldvar2vis=0) 
-
-  # REACTIVE VALUES :
-  UV <- reactiveValues(var1vis=NULL,  var2vis=NULL, count=0)
-
   observe({
-    if(!is.null(UV$var1vis) && !is.null(UV$var2vis)) UV$count <- isolate(UV$count) + any(UV$var1vis==UV$var2vis)
+    
+    currentvar1 <- input$var1vis
+    
+    var2 <- input$var2vis
+    facet1 <- input$facet1
+    facet2 <- input$facet2
+    
+    updateSelectizeInput(session, "var1vis", choices = c(setdiff(variables$predictorVars, c(var2, facet1, facet2))), selected = currentvar1)
+    
   })
-  output$count <- renderText({ UV$count })
-  ##
-  #
-  # the case of one of the var1vis set to the same value as the reponse
-  #
+  
   observe({
-    if(!is.null(input$var2vis)){
-      S$oldvar1vis <- isolate(input$var1vis)
-    }
+    
+    currentvar2 <- input$var2vis
+    
+    var1 <- input$var1vis
+    facet1 <- input$facet1
+    facet2 <- input$facet2
+  
+  updateSelectizeInput(session, "var2vis", choices = c(setdiff(variables$predictorVars, c(var1, facet1, facet2))), selected = currentvar2)
+  
   })
+  
   observe({
-    if(!is.null(input$var1vis)){
-      if(all(input$var1vis!=isolate(input$var2vis))){
-        S$oldvar1vis <- input$var1vis
-        UV$var1vis <- input$var1vis; UV$var2vis <- isolate(input$var2vis)
-      }
-      else{ # we exchange the matching predictor and var2vis 
-        oldvar1vis <- isolate(S$oldvar1vis)
-        updateSelectInput(session, "var2vis", choices=input$predictors, selected=oldvar1vis)
-        UV$var1vis <- input$var1vis; UV$var2vis <- oldvar1vis 
-      }
-    }
+    
+    currentfacet1 <- input$facet1
+    
+    var1 <- input$var1vis
+    var2 <- input$var2vis
+    facet2 <- input$facet2
+    
+  updateSelectizeInput(session, "facet1", choices = c(setdiff(variables$predictorVars, c(var1, var2, facet2))), selected = currentfacet1)
+  
   })
-  ##
-  #
-  # 2) the case of the var2vis being set to the same value as a predictor
-  #
+  
   observe({
-    if(!is.null(input$var1vis)){
-      S$oldvar2vis <- isolate(input$var2vis)
-    }
+    
+    currentfacet2 <- input$facet2
+    
+    var1 <- input$var1vis
+    var2 <- input$var2vis
+    facet1 <- input$facet1
+  updateSelectizeInput(session, "facet2", choices = c(setdiff(variables$predictorVars, c(var1, var2, facet1))), selected = currentfacet2)
+  
   })
-  observe({
-    if(!is.null(input$var2vis)){
-      if(all(input$var2vis!=isolate(input$var1vis))){
-        S$oldvar2vis <- input$var2vis
-        UV$var1vis <- isolate(input$var1vis); UV$var2vis <- input$var2vis
-      }
-      else{  #  exchange var1vis and var2vis 
-        oldvar2vis <- isolate(S$oldvar2vis)
-        updateSelectInput(session, "var1vis", choices=input$predictors, selected=oldvar2vis)
-        UV$var1vis <- oldvar2vis; UV$var2vis <- input$var2vis
-      }
-    }
-  })
+  
+  
 })
