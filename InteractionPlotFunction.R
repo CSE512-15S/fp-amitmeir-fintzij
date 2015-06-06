@@ -16,6 +16,14 @@ interactionPlot <- function(varsInModel,data,error) {
     return(stupidGGplot)
   }
   
+  # Identifty which variable is an interaction and which is a main effect
+  interactionInd <- sapply(varsInModel,function(x) grepl(":",x))
+  interactions <- varsInModel[which(interactionInd)]
+  varsInModel <- varsInModel[which(!interactionInd)]
+  interactionMatrix <- sapply(interactions,function(x) strsplit(x,":")[[1]]) 
+  interactionMatrix <- matrix(interactionMatrix,ncol=2)
+  
+  
   #Computing correlations with error
   varsInModel <- sort(varsInModel)
   nInteractions <- choose(length(varsInModel),2)+length(varsInModel)
@@ -39,11 +47,30 @@ interactionPlot <- function(varsInModel,data,error) {
   interactions$roundCor <- round(interactions$errorCorrelation,2)
   interactions$errorCorRound2 <- round(interactions$errorCorrelation,2)
   
+  #finding out which interactions are in the model 
+  checkIfInInteractions <- function(row,interactionMatrix) {
+    row <- sapply(row,as.character)
+    for(i in 1:nrow(interactionMatrix)) {
+      rowMat <- interactionMatrix[i,]
+      if(row[1] %in% rowMat) {
+        rowMat <- rowMat[-which(row[1]==rowMat)[[1]]]
+        if(row[2]==rowMat) {
+          return(TRUE)
+        }
+      }
+    }
+    return(FALSE)
+  }
+  inModel <- apply(interactions[,1:2],1,checkIfInInteractions,interactionMatrix)
+  
   interactionPlot <- ggplot(interactions) + 
-    geom_tile(aes(x=var1,y=var2,fill=errorCorrelation)) +
+    geom_tile(data=interactions[inModel,],aes(x=var1,y=var2,height=0.98,width=0.98),fill="black") +
+    geom_tile(aes(x=var1,y=var2,fill=errorCorrelation,height=0.92,width=0.92)) +
     theme_bw() + 
     scale_fill_gradient2(limits=c(-1,1),low="blue",midpoint=0, high="red") +
-    geom_text(aes(x=var1,y=var2,label=paste(var1,"\n",var2,"\n",errorCorRound2)),size=15/length(varsInModel))
+    geom_text(aes(x=var1,y=var2,label=paste(var1,"\n",var2,"\n",errorCorRound2)),size=15/length(varsInModel)) +
+    scale_x_discrete(expand=c(0.04,0.04)) + 
+    scale_y_discrete(expand=c(0.04,0.04))
   
   return(interactionPlot)
   
