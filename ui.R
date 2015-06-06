@@ -67,7 +67,7 @@ shinyUI(navbarPage("Exploratory binary classifier construction",
                                      uiOutput("vismargins")
                               ),
                               column(4,
-                                     actionButton("plotboundary", label = h4("Plot boundary"))
+                                     actionButton("boundaryButton", label = h4("Plot boundary"))
                                      )
                             ),
                             fluidRow(
@@ -80,7 +80,8 @@ shinyUI(navbarPage("Exploratory binary classifier construction",
                               column(7,
                                      h3("Boundary visualization"),
                                      hr(),
-                                     h4("Visualization settings"))
+                                     plotOutput("boundaryplot")
+                                     )
                             )
                    ),
                    tabPanel(actionButton("performanceButton", label = h5("Classifier performance")))

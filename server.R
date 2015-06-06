@@ -220,9 +220,7 @@ shinyServer(function(input, output, session) {
   })
   
   
-
-  
-  # selectizeInput for plot margins
+# selectizeInput for plot margins
   output$vismargins <- renderUI({
     
     # extract variable names
@@ -231,15 +229,16 @@ shinyServer(function(input, output, session) {
     # generate selectizeInputs
     list(
       
-      selectizeInput("var1vis", "Margin 1", choices = c("Select margin 1", predic_vars)),
-      selectizeInput("var2vis", "Margin 2", choices = c("Select margin 2", predic_vars)),
-      selectizeInput("facet1", "Facet 1", choices = c("Select facet 1", predic_vars)),
-      selectizeInput("facet2", "Facet 2", choices = c("Select facet 2", predic_vars))
+      selectizeInput("var1vis", "X - Axis", choices = c("Select X - Axis", predic_vars)),
+      selectizeInput("var2vis", "Y - Axis", choices = c("Select Y - Axis", predic_vars)),
+      selectizeInput("facet1", "X - Facet", choices = c("Select X - Facet", predic_vars)),
+      selectizeInput("facet2", "Y - Facet", choices = c("Select Y - Facet", predic_vars))
       
     )
     
   })
   
+  # prevent overlapping selection of margins and facets
   observe({
     
     currentvar1 <- input$var1vis
@@ -287,5 +286,40 @@ shinyServer(function(input, output, session) {
   
   })
   
+  
+  # main plot
+  mainplotreactive <- eventReactive(input$boundaryButton,{
+    
+    xvar <- input$var1vis
+    yvar <- input$var2vis
+    facetx <- input$facet1
+    facety <- input$facet2
+    
+    response <- variables$responseVar
+    
+    predictions <- fittedmod$prediction
+    
+    dat <- inputData()
+    
+  })
+  
+  output$boundaryplot <- renderPlot({
+    
+    mainplotreactive()
+    
+    xvar <- input$var1vis
+    yvar <- input$var2vis
+    facetx <- input$facet1
+    facety <- input$facet2
+    
+    response <- variables$responseVar
+    
+    predictions <- fittedmod$prediction
+    
+    dat <- inputData()
+    
+    mainPlotFunction(xVar = xvar, yVar = yvar, facetX = facetx, facetY = facety, response = response, data = dat, predictions = predictions)
+    
+  })
   
 })
