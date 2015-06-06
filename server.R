@@ -169,6 +169,10 @@ shinyServer(function(input, output, session) {
     
   })
   
+  observeEvent(input$setoptimal,{
+    fitmod <- model()
+    updateSliderInput(session, "penalty", value = fitmod$optimal, min = 0, max = 2*signif(max(fitmod$penalty),3), step = 0.001)
+  })
   
 
   # main effects plot

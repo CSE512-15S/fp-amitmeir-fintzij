@@ -55,7 +55,7 @@ shinyUI(navbarPage("Exploratory binary classifier construction",
                                                     choices = list("Penalized logistic regression" = "logit",
                                                                    "Penalized linear regression" = "linear")),
                                      sliderInput("penalty", "Set L1 penalty parameter", min = 0, max = 0, value = 0,sep="", round = -3,step = 0.001),
-                                     actionButton("setoptimal", "Optimal penalty"),
+                                     actionButton("setoptimal", "Reset to optimal penalty"),
                                      br(), br(), br(),
                                      textOutput("printpreds")
                                      ),
