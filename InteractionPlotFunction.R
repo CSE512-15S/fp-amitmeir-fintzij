@@ -367,7 +367,7 @@ mainPlotFunction <- function(xVar=NULL,yVar=NULL,facetX=NULL,facetY=NULL,respons
   }
   
   #If only one variable is selected then return a boxplot
-  if(sum(is.null(c(xVar,yVar)))==1) {
+  if((is.null(xVar) + is.null(yVar))==1) {
     variable <- ifelse(!is.null(xVar),xVar,yVar)
     commandPlot <- paste("ggplot(data=tempData,aes(x=",response,",y=",variable,"))")
     commandPlot <- paste(commandPlot,"+geom_boxplot()")
@@ -377,11 +377,6 @@ mainPlotFunction <- function(xVar=NULL,yVar=NULL,facetX=NULL,facetY=NULL,respons
     ggPlot <- eval(parse(text=commandPlot))
     return(ggPlot)
   }
-  
-
-  
-  
-  
   
   #A function for smoothing the predictions over the domain of the variables
   #Computing the ranges on which smoothing must be done
@@ -480,7 +475,7 @@ plotCV <- function(fit) {
 # mainEffectPlot(allVariables,varsInModel,response,data,error=error)
 # data$facx <- rbinom(nrow(data),1,0.5)
 # data$facy <- rbinom(nrow(data),1,0.5)
-# mainPlotFunction(xVar="Sepal.Length",yVar="Petal.Width",facetX="Petal.Length",facetY=NULL,response="is.virginica",data,predictions)
+# mainPlotFunction(xVar="Sepal.Length",yVar="Petal.Length",facetX="Sepal.Width",facetY=NULL,response="is.virginica",data=data,predictions=predictions)
 
 # # 
 # par(mfrow=c(1,2),mar=rep(4,4))
