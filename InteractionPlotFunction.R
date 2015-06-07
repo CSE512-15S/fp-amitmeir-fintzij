@@ -12,7 +12,7 @@ interactionPlot <- function(varsInModel,data,error) {
   
   if(length(varsInModel)==0) {
     stupidData <- data.frame(a=1:3,b=1:3)
-    stupidGGplot <- ggplot(stupidData) + geom_point(aes(x=a,y=b))
+    stupidGGplot <- ggplot(stupidData) + geom_point(aes(x=a,y=b)) + theme_bw()
     return(stupidGGplot)
   }
   
@@ -76,7 +76,7 @@ interactionPlot <- function(varsInModel,data,error) {
     geom_tile(aes(x=var1,y=var2,fill=errorCorrelation,height=0.88,width=0.88)) +
     theme_bw() + 
     scale_fill_gradient2(limits=c(-1,1),low="blue",midpoint=0, high="red") +
-    geom_text(aes(x=var1,y=var2,label=paste(var1,"\n",var2,"\n",errorCorRound2)),size=15/length(varsInModel)) +
+    geom_text(aes(x=var1,y=var2,label=paste(var1,"\n",var2,"\n",errorCorRound2)),size=10/length(varsInModel)) +
     scale_x_discrete(expand=c(0.04,0.04)) + 
     scale_y_discrete(expand=c(0.04,0.04)) + 
     theme(axis.title.x = element_blank(),
@@ -155,9 +155,12 @@ mainEffectPlot <- function(allVariables,varsInModel,response,data,error=NULL) {
     return(stupidGGVIS)
   }
   
-  interactionInd <- sapply(varsInModel,function(x) grepl(":",x))
-  interactions <- varsInModel[which(interactionInd)]
-  main <- varsInModel[which(!interactionInd)]
+  if(length(varsInModel)>0) {
+    interactionInd <- sapply(varsInModel,function(x) grepl(":",x))
+    interactions <- varsInModel[which(interactionInd)]
+    main <- varsInModel[which(!interactionInd)]
+  }
+  
   
   #Computing correlations
   nVars <- length(allVariables)
@@ -328,19 +331,6 @@ mainPlotFunction <- function(xVar=NULL,yVar=NULL,facetX=NULL,facetY=NULL,respons
   #return null if no variables are selected
   if(all(is.null(c(xVar,yVar)))) return(NULL)
   
-  #If only one variable is selected then return a boxplot
-  if(sum(is.null(c(xVar,yVar)))==1) {
-    variable <- ifelse(!is.null(xVar),xVar,yVar)
-    commandPlot <- paste("ggplot(data=tempData,aes(x=",response,",y=",variable,"))")
-    commandPlot <- paste(commandPlot,"+geom_boxplot()")
-    commandPlot <- paste(commandPlot,"+facet_grid(",facetY,"~",facetX,",labeller=label_both)")
-    commandPlot <- paste(commandPlot,"+theme_bw()")
-    if(is.null(xVar)) commandPlot <- paste(commandPlot,"+coord_flip()")
-    ggPlot <- eval(parse(text=commandPlot))
-    return(ggPlot)
-  }
-  
-  #If both variables are supplied
   ## Add dummy faceting variables for streamlining
   if(is.null(facetX)) {
     tempData$xfacet <- rep("",nrow(tempData))
@@ -351,7 +341,6 @@ mainPlotFunction <- function(xVar=NULL,yVar=NULL,facetX=NULL,facetY=NULL,respons
     tempData$yfacet <- rep("",nrow(tempData))
     facetY <- "yfacet"
   }
-  
   
   ##If facetting variable has too many value, 
   facetToFactor <- function(var) {
@@ -376,6 +365,20 @@ mainPlotFunction <- function(xVar=NULL,yVar=NULL,facetX=NULL,facetY=NULL,respons
     commandConvertToFactor <- paste("tempData$",facetY,"<- facetToFactor(tempData$",facetY,")")
     eval(parse(text=commandConvertToFactor))
   }
+  
+  #If only one variable is selected then return a boxplot
+  if(sum(is.null(c(xVar,yVar)))==1) {
+    variable <- ifelse(!is.null(xVar),xVar,yVar)
+    commandPlot <- paste("ggplot(data=tempData,aes(x=",response,",y=",variable,"))")
+    commandPlot <- paste(commandPlot,"+geom_boxplot()")
+    commandPlot <- paste(commandPlot,"+facet_grid(",facetY,"~",facetX,",labeller=label_both)")
+    commandPlot <- paste(commandPlot,"+theme_bw()")
+    if(is.null(xVar)) commandPlot <- paste(commandPlot,"+coord_flip()")
+    ggPlot <- eval(parse(text=commandPlot))
+    return(ggPlot)
+  }
+  
+
   
   
   
@@ -465,7 +468,7 @@ plotCV <- function(fit) {
 # mainEffectPlot(allVariables,varsInModel,response,data,error=error)
 # data$facx <- rbinom(nrow(data),1,0.5)
 # data$facy <- rbinom(nrow(data),1,0.5)
-# mainPlotFunction(xVar="Sepal.Length",yVar="Petal.Width",facetX="facx",facetY="facy",response="is.virginica",data,predictions)
+#mainPlotFunction(xVar="Sepal.Length",yVar="Petal.Width",facetX="Sepal.Width",facetY=NULL,response="is.virginica",data,predictions)
 # 
 # plotROC(response,predictions,data)
 
