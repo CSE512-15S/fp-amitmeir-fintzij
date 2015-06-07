@@ -85,6 +85,7 @@ shinyUI(navbarPage("Exploratory binary classifier construction",
                               ),
                               column(7,
                                      hr(),
+                                     textOutput("printmargins"),
                                      plotOutput("boundaryplot")
                                      )
                             )

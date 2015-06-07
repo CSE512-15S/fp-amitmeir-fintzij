@@ -305,22 +305,22 @@ shinyServer(function(input, output, session) {
   
   
   # main plot
-  mainplotreactive <- eventReactive(input$boundaryButton,{
-    
-    xvar <- input$var1vis
-    yvar <- input$var2vis
-    facetx <- input$facet1
-    facety <- input$facet2
-    
-    response <- variables$responseVar
-    
-    predictions <- fittedmod$prediction
-    
-  })
+#   mainplotreactive <- eventReactive(input$boundaryButton,{
+#     
+#     xvar <- input$var1vis
+#     yvar <- input$var2vis
+#     facetx <- input$facet1
+#     facety <- input$facet2
+#     
+#     response <- variables$responseVar
+#     
+#     predictions <- fittedmod$prediction
+#     
+#   })
   
   output$boundaryplot <- renderPlot({
     
-    mainplotreactive()
+    input$boundaryButton
     
     xvar <- input$var1vis
     yvar <- input$var2vis
@@ -331,10 +331,19 @@ shinyServer(function(input, output, session) {
     
     predictions <- fittedmod$prediction
     
-    dat <- inputData()
-    
-    mainPlotFunction(xVar = xvar, yVar = yvar, facetX = facetx, facetY = facety, response = response, data = dat, predictions = predictions)
+    mainPlotFunction(xVar = xvar, yVar = yvar, facetX = facetx, facetY = facety, response = response, data = inputData(), predictions = predictions)
     
   })
   
+  output$printmargins <- renderPrint(({
+    
+    c(input$var1vis, class(input$var1vis), 
+      input$var2vis, class(input$var2vis), 
+      input$facet1, class(input$facet1),
+      input$facet2, class(input$facet2))
+    
+  }))
+  
 })
+
+  
