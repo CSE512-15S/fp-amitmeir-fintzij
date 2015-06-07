@@ -331,19 +331,6 @@ mainPlotFunction <- function(xVar=NULL,yVar=NULL,facetX=NULL,facetY=NULL,respons
   #return null if no variables are selected
   if(all(is.null(c(xVar,yVar)))) return(NULL)
   
-  #If only one variable is selected then return a boxplot
-  if(sum(is.null(c(xVar,yVar)))==1) {
-    variable <- ifelse(!is.null(xVar),xVar,yVar)
-    commandPlot <- paste("ggplot(data=tempData,aes(x=",response,",y=",variable,"))")
-    commandPlot <- paste(commandPlot,"+geom_boxplot()")
-    commandPlot <- paste(commandPlot,"+facet_grid(",facetY,"~",facetX,",labeller=label_both)")
-    commandPlot <- paste(commandPlot,"+theme_bw()")
-    if(is.null(xVar)) commandPlot <- paste(commandPlot,"+coord_flip()")
-    ggPlot <- eval(parse(text=commandPlot))
-    return(ggPlot)
-  }
-  
-  #If both variables are supplied
   ## Add dummy faceting variables for streamlining
   if(is.null(facetX)) {
     tempData$xfacet <- rep("",nrow(tempData))
@@ -354,7 +341,6 @@ mainPlotFunction <- function(xVar=NULL,yVar=NULL,facetX=NULL,facetY=NULL,respons
     tempData$yfacet <- rep("",nrow(tempData))
     facetY <- "yfacet"
   }
-  
   
   ##If facetting variable has too many value, 
   facetToFactor <- function(var) {
@@ -379,6 +365,20 @@ mainPlotFunction <- function(xVar=NULL,yVar=NULL,facetX=NULL,facetY=NULL,respons
     commandConvertToFactor <- paste("tempData$",facetY,"<- facetToFactor(tempData$",facetY,")")
     eval(parse(text=commandConvertToFactor))
   }
+  
+  #If only one variable is selected then return a boxplot
+  if(sum(is.null(c(xVar,yVar)))==1) {
+    variable <- ifelse(!is.null(xVar),xVar,yVar)
+    commandPlot <- paste("ggplot(data=tempData,aes(x=",response,",y=",variable,"))")
+    commandPlot <- paste(commandPlot,"+geom_boxplot()")
+    commandPlot <- paste(commandPlot,"+facet_grid(",facetY,"~",facetX,",labeller=label_both)")
+    commandPlot <- paste(commandPlot,"+theme_bw()")
+    if(is.null(xVar)) commandPlot <- paste(commandPlot,"+coord_flip()")
+    ggPlot <- eval(parse(text=commandPlot))
+    return(ggPlot)
+  }
+  
+
   
   
   
@@ -468,7 +468,7 @@ plotCV <- function(fit) {
 # mainEffectPlot(allVariables,varsInModel,response,data,error=error)
 # data$facx <- rbinom(nrow(data),1,0.5)
 # data$facy <- rbinom(nrow(data),1,0.5)
-mainPlotFunction(xVar="Sepal.Length",yVar="Petal.Width",facetX="Sepal.Width",facetY=NULL,response="is.virginica",data,predictions)
+#mainPlotFunction(xVar="Sepal.Length",yVar="Petal.Width",facetX="Sepal.Width",facetY=NULL,response="is.virginica",data,predictions)
 # 
 # plotROC(response,predictions,data)
 
