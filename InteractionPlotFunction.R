@@ -313,7 +313,7 @@ fitGlmnetModel <- function(response,varsInModel,data,lambda=NULL,family="binomia
 }
 
 #A function for the main model fit plot
-mainPlotFunction <- function(xVar=NULL,yVar=NULL,facetX=NULL,facetY=NULL,response=NULL,data,predictions) {
+mainPlotFunction <- function(xVar="",yVar="",facetX="",facetY="",response="",data,predictions) {
   #Constructing data set for the plot
   tempData <- data[,which(names(data) %in% c(xVar,yVar,facetX,facetY,response))]
   tempData <- cbind(tempData,predictions=predictions)
@@ -329,15 +329,15 @@ mainPlotFunction <- function(xVar=NULL,yVar=NULL,facetX=NULL,facetY=NULL,respons
   ################
   
   #return null if no variables are selected
-  if(all(is.null(c(xVar,yVar)))) return(NULL)
+  if(all(c(xVar,yVar)=="")) return(NULL)
   
   ## Add dummy faceting variables for streamlining
-  if(is.null(facetX)) {
+  if(facetX=="") {
     tempData$xfacet <- rep("",nrow(tempData))
     facetX <- "xfacet"
   }
   
-  if(is.null(facetY)) {
+  if(facetY=="") {
     tempData$yfacet <- rep("",nrow(tempData))
     facetY <- "yfacet"
   }
@@ -367,13 +367,13 @@ mainPlotFunction <- function(xVar=NULL,yVar=NULL,facetX=NULL,facetY=NULL,respons
   }
   
   #If only one variable is selected then return a boxplot
-  if((is.null(xVar) + is.null(yVar))==1) {
-    variable <- ifelse(!is.null(xVar),xVar,yVar)
+  if(sum(c(xVar,yVar)=="")==1) {
+    variable <- ifelse(xVar!="",xVar,yVar)
     commandPlot <- paste("ggplot(data=tempData,aes(x=",response,",y=",variable,"))")
     commandPlot <- paste(commandPlot,"+geom_boxplot()")
     commandPlot <- paste(commandPlot,"+facet_grid(",facetY,"~",facetX,",labeller=label_both)")
     commandPlot <- paste(commandPlot,"+theme_bw()")
-    if(is.null(xVar)) commandPlot <- paste(commandPlot,"+coord_flip()")
+    if(xVar=="") commandPlot <- paste(commandPlot,"+coord_flip()")
     ggPlot <- eval(parse(text=commandPlot))
     return(ggPlot)
   }
