@@ -78,7 +78,9 @@ shinyUI(navbarPage("Exploratory binary classifier construction",
                             fluidRow(
                               column(5,
                                      hr(),
+                                     h4("Correlation between main effects and model errors"),
                                      plotOutput("mainEffectsPlot", width = "100%", height = "300px"),
+                                     h4("Correlation between interactions and model errors"),
                                      plotOutput("interactionplot")
                               ),
                               column(7,

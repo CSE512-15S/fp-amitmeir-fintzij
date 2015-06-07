@@ -316,8 +316,6 @@ shinyServer(function(input, output, session) {
     
     predictions <- fittedmod$prediction
     
-    dat <- inputData()
-    
   })
   
   output$boundaryplot <- renderPlot({
