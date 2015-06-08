@@ -171,13 +171,8 @@ mainEffectPlot <- function(allVariables,varsInModel,response,data,error=NULL) {
     if(FALSE) { #if(allVariables[i] %in% varsInModel) {
       correlations$correlation[i] <- 1
     } else {
-      commandComputeCor <- "with(data,cor("
-      if(is.null(varsInModel)) {
-        commandComputeCor <- paste(commandComputeCor,response)
-      } else { 
-        commandComputeCor <- paste(commandComputeCor,"error")
-      }
-      commandComputeCor <- paste(commandComputeCor,",",allVariables[i],",method='spearman'))")
+      tocor <- ifelse(is.null(varsInModel),response,"error")
+      commandComputeCor <- paste("summary(lm(",tocor,"~",allVariables[i],",data=data))$r.squared")
       correlations$correlation[i] <- eval(parse(text=commandComputeCor))
     }
   }
