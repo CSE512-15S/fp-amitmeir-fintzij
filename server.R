@@ -237,6 +237,7 @@ shinyServer(function(input, output, session) {
   })
   
   
+  
 # selectizeInput for plot margins
   output$vismargins <- renderUI({
     
@@ -338,6 +339,14 @@ shinyServer(function(input, output, session) {
       input$facet2, class(input$facet2))
     
   }))
+  
+  output$cvplot <- renderPlot({
+    plotCV(fittedmod$fit)
+  })
+  
+  output$rocplot <- renderPlot({
+    plotROC(variables$responseVar, fittedmod$prediction, inputData())
+  })
   
 })
 

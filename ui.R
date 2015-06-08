@@ -90,5 +90,17 @@ shinyUI(navbarPage("Exploratory binary classifier construction",
                                      )
                             )
                    ),
-                   tabPanel(actionButton("performanceButton", label = h5("Classifier performance")))
+                   tabPanel(actionButton("performanceButton", label = h5("Classifier performance")),
+                            fluidRow(
+                              column(6,
+                                     h3("Cross-validation results"),
+                                     hr(),
+                                     plotOutput("cvplot")
+                                     ),
+                              column(6,
+                                     h3("Receiver operating characteristic curve"),
+                                     hr(),
+                                     plotOutput("rocplot"))
+                            )
+                            )
 ))
