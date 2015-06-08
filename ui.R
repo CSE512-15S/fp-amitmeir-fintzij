@@ -36,6 +36,7 @@ shinyUI(navbarPage("Exploratory binary classifier construction",
                               
                               mainPanel(
                                 h3("Data summary"),
+                                uiOutput("tosummarize"),
                                 verbatimTextOutput("summary"),
                                 hr(),
                                 h3("Data"),

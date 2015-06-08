@@ -49,7 +49,19 @@ shinyServer(function(input, output, session) {
     
     dataset <- inputData()
     
-    summary(dataset)
+    tosummarize <- input$tosummarize
+    
+    cat(ifelse(is.null(tosummarize), "No variables chosen. Select variables to display summary statistics.", summary(dataset[match(tosummarize, names(dataset))])))
+    
+  })
+  
+  output$tosummarize <- renderUI({
+    
+    dataset <- inputData()
+    
+    vars <- names(dataset)
+    
+    selectizeInput("tosummarize", "Number of variables to display in summary: ", choices = vars, multiple = TRUE)
     
   })
 
@@ -242,7 +254,7 @@ shinyServer(function(input, output, session) {
   output$vismargins <- renderUI({
     
     # extract variable names
-    predic_vars <- variables$predictorVars
+    predic_vars <- isolate(variables$predictorVars)
     
     # generate selectizeInputs
     list(
