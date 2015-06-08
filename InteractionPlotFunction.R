@@ -398,8 +398,8 @@ mainPlotFunction <- function(xVar="",yVar="",facetX="",facetY="",response="",dat
     }
     
     #Setting up "new data"
-    grid <- expand.grid(x=seq(from=xRange[1],to=xRange[2],length.out=45),
-                        y=seq(from=yRange[1],to=yRange[2],length.out=45))
+    grid <- expand.grid(x=seq(from=xRange[1],to=xRange[2],length.out=15),
+                        y=seq(from=yRange[1],to=yRange[2],length.out=15))
     names(grid) <- c(xVar,yVar)
     grid <- data.frame(grid)
     pred <- predict.gam(smoothFit,newdata=grid,type="response")
