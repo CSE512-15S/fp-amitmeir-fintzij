@@ -298,21 +298,8 @@ fitGlmnetModel <- function(response,varsInModel,data,lambda=NULL,family="binomia
   commandDesignMatrix <- paste(commandDesignMatrix,",data=data))")
   eval(parse(text=commandDesignMatrix))
   
-  #Fitting Model
-  commandDesignMatrix <- paste("X <- model.matrix(lm(",response,"~1")
-  for(i in 1:length(main)) {
-    commandDesignMatrix <- paste(commandDesignMatrix,"+",main[i])
-  }
-  
-  if(any(interactionInd)) {
-    for(i in 1:nrow(interactionMatrix)) {
-      commandDesignMatrix <- paste(commandDesignMatrix,"+I(",
-                                   interactionMatrix[i,1],"*",interactionMatrix[i,2],")")
-    }
-  }
-  
-  commandDesignMatrix <- paste(commandDesignMatrix,",data=data))")
-  eval(parse(text=commandDesignMatrix))
+  commandFitModel <- paste("fit <- cv.glmnet(y=data$",response,",x=as.matrix(X),family='",family,"')",sep="")
+  eval(parse(text=commandFitModel))
   
   if(is.null(lambda)) {
     prediction <- predict(fit,newx=as.matrix(X),type="response")
