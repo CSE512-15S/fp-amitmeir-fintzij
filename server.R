@@ -159,8 +159,8 @@ shinyServer(function(input, output, session) {
     fittedmod$penalty <- fitmod$penalty
     fittedmod$optimal <- fitmod$optimal    
 
-    varsinmod <- variables$varsInModel
-    oldvarsinmod <- variables$oldVarsInModel
+    varsinmod <- isolate(variables$varsInModel)
+    oldvarsinmod <- isolate(variables$oldVarsInModel)
     
     if(!identical(varsinmod, oldvarsinmod)){
       updateSliderInput(session, "penalty", value = fitmod$optimal, min = 0, max = 2*signif(max(fitmod$penalty),3), step = 0.001)
@@ -180,10 +180,10 @@ shinyServer(function(input, output, session) {
     
     fitreactive()
     
-    predictors <- variables$predictorVars
-    varsinmodel <- variables$varsInModel
-    responsevar <- variables$responseVar
-    error <- fittedmod$error
+    predictors <- isolate(variables$predictorVars)
+    varsinmodel <- isolate(variables$varsInModel)
+    responsevar <- isolate(variables$responseVar)
+    error <- isolate(fittedmod$error)
     
     mainEffectPlot(allVariables = predictors,
                    varsInModel = varsinmodel,
@@ -197,8 +197,8 @@ shinyServer(function(input, output, session) {
     
     fitreactive()
     
-    varsinmodel <- variables$varsInModel
-    error <- fittedmod$error
+    varsinmodel <- isolate(variables$varsInModel)
+    error <- isolate(fittedmod$error)
     
     interactionPlot(varsInModel = varsinmodel,
                    data = inputData(),
@@ -316,14 +316,14 @@ shinyServer(function(input, output, session) {
     
     mainplotreactive()
     
-    xvar <- input$var1vis
-    yvar <- input$var2vis
-    facetx <- input$facet1
-    facety <- input$facet2
+    xvar <- isolate(input$var1vis)
+    yvar <- isolate(input$var2vis)
+    facetx <- isolate(input$facet1)
+    facety <- isolate(input$facet2)
     
-    response <- variables$responseVar
+    response <- isolate(variables$responseVar)
     
-    predictions <- fittedmod$prediction
+    predictions <- isolate(fittedmod$prediction)
     
     dat <- inputData()
     
