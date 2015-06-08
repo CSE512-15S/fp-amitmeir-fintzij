@@ -288,7 +288,7 @@ fitGlmnetModel <- function(response,varsInModel,data,lambda=NULL,family="binomia
   
   require(glmnet)
   #Generating design matrix
-  commandDesignMatrix <- "X <- model.frame(~1"
+  commandDesignMatrix <- paste("X <- model.matrix(lm(",response,"~1")
   for(i in 1:length(main)) {
     commandDesignMatrix <- paste(commandDesignMatrix,"+",main[i])
   }
@@ -300,12 +300,24 @@ fitGlmnetModel <- function(response,varsInModel,data,lambda=NULL,family="binomia
     }
   }
 
-  commandDesignMatrix <- paste(commandDesignMatrix,",data=data)")
+  commandDesignMatrix <- paste(commandDesignMatrix,",data=data))")
   eval(parse(text=commandDesignMatrix))
   
   #Fitting Model
-  commandFitModel <- paste("fit <- cv.glmnet(y=data$",response,",x=as.matrix(X),family='",family,"')",sep="")
-  eval(parse(text=commandFitModel))
+  commandDesignMatrix <- paste("X <- model.matrix(lm(",response,"~1")
+  for(i in 1:length(main)) {
+    commandDesignMatrix <- paste(commandDesignMatrix,"+",main[i])
+  }
+  
+  if(any(interactionInd)) {
+    for(i in 1:nrow(interactionMatrix)) {
+      commandDesignMatrix <- paste(commandDesignMatrix,"+I(",
+                                   interactionMatrix[i,1],"*",interactionMatrix[i,2],")")
+    }
+  }
+  
+  commandDesignMatrix <- paste(commandDesignMatrix,",data=data))")
+  eval(parse(text=commandDesignMatrix))
   
   if(is.null(lambda)) {
     prediction <- predict(fit,newx=as.matrix(X),type="response")
@@ -474,7 +486,7 @@ plotCV <- function(fit) {
 # 
 # plotROC(response,predictions,data)
 
-# result <- fitGlmnetModel(response,varsInModel,data,lambda=NULL,family='binomial')
+# result <- fitGlmnetModel(response,varsInModel,adult,lambda=NULL,family='binomial')
 # fit <- result$fit
 # error <- result$error
 # predictions <- result$prediction
