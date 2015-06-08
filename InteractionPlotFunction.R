@@ -314,6 +314,8 @@ fitGlmnetModel <- function(response,varsInModel,data,lambda=NULL,family="binomia
 
 #A function for the main model fit plot
 mainPlotFunction <- function(xVar="",yVar="",facetX="",facetY="",response="",data,predictions) {
+  if(all(c(xVar,yVar)=="")) return(plot(1,1,xlim=c(0,0.5)))
+  
   #Constructing data set for the plot
   tempData <- data[,which(names(data) %in% c(xVar,yVar,facetX,facetY,response))]
   tempData <- cbind(tempData,predictions=predictions)
@@ -329,7 +331,6 @@ mainPlotFunction <- function(xVar="",yVar="",facetX="",facetY="",response="",dat
   ################
   
   #return null if no variables are selected
-  if(all(c(xVar,yVar)=="")) return(NULL)
   
   ## Add dummy faceting variables for streamlining
   if(facetX=="") {
