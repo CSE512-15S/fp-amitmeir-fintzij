@@ -246,10 +246,10 @@ shinyServer(function(input, output, session) {
     # generate selectizeInputs
     list(
       
-      selectizeInput("var1vis", "X - Axis", choices = c("Select X - Axis", predic_vars)),
-      selectizeInput("var2vis", "Y - Axis", choices = c("Select Y - Axis", predic_vars)),
-      selectizeInput("facet1", "X - Facet", choices = c("Select X - Facet", predic_vars)),
-      selectizeInput("facet2", "Y - Facet", choices = c("Select Y - Facet", predic_vars))
+      selectizeInput("var1vis", "X - Axis", choices = c(NULL, predic_vars)),
+      selectizeInput("var2vis", "Y - Axis", choices = c(NULL, predic_vars)),
+      selectizeInput("facet1", "X - Facet", choices = c(NULL, predic_vars)),
+      selectizeInput("facet2", "Y - Facet", choices = c(NULL, predic_vars))
       
     )
     
@@ -264,7 +264,7 @@ shinyServer(function(input, output, session) {
     facet1 <- input$facet1
     facet2 <- input$facet2
     
-    updateSelectizeInput(session, "var1vis", choices = c(setdiff(variables$predictorVars, c(var2, facet1, facet2))), selected = currentvar1)
+    updateSelectizeInput(session, "var1vis", choices = c(NULL, setdiff(variables$predictorVars, c(var2, facet1, facet2))), selected = currentvar1)
     
   })
   
@@ -276,7 +276,7 @@ shinyServer(function(input, output, session) {
     facet1 <- input$facet1
     facet2 <- input$facet2
   
-  updateSelectizeInput(session, "var2vis", choices = c(setdiff(variables$predictorVars, c(var1, facet1, facet2))), selected = currentvar2)
+  updateSelectizeInput(session, "var2vis", choices = c(NULL, setdiff(variables$predictorVars, c(var1, facet1, facet2))), selected = currentvar2)
   
   })
   
@@ -288,7 +288,7 @@ shinyServer(function(input, output, session) {
     var2 <- input$var2vis
     facet2 <- input$facet2
     
-  updateSelectizeInput(session, "facet1", choices = c(setdiff(variables$predictorVars, c(var1, var2, facet2))), selected = currentfacet1)
+  updateSelectizeInput(session, "facet1", choices = c(NULL, setdiff(variables$predictorVars, c(var1, var2, facet2))), selected = currentfacet1)
   
   })
   
@@ -299,28 +299,21 @@ shinyServer(function(input, output, session) {
     var1 <- input$var1vis
     var2 <- input$var2vis
     facet1 <- input$facet1
-  updateSelectizeInput(session, "facet2", choices = c(setdiff(variables$predictorVars, c(var1, var2, facet1))), selected = currentfacet2)
+  updateSelectizeInput(session, "facet2", choices = c(NULL, setdiff(variables$predictorVars, c(var1, var2, facet1))), selected = currentfacet2)
   
   })
   
   
   # main plot
-#   mainplotreactive <- eventReactive(input$boundaryButton,{
-#     
-#     xvar <- input$var1vis
-#     yvar <- input$var2vis
-#     facetx <- input$facet1
-#     facety <- input$facet2
-#     
-#     response <- variables$responseVar
-#     
-#     predictions <- fittedmod$prediction
-#     
-#   })
+  mainplotreactive <- reactive({
+    
+    input$boundaryButton
+    
+  })
   
   output$boundaryplot <- renderPlot({
     
-    input$boundaryButton
+    mainplotreactive()
     
     xvar <- input$var1vis
     yvar <- input$var2vis
@@ -331,7 +324,9 @@ shinyServer(function(input, output, session) {
     
     predictions <- fittedmod$prediction
     
-    mainPlotFunction(xVar = xvar, yVar = yvar, facetX = facetx, facetY = facety, response = response, data = inputData(), predictions = predictions)
+    dat <- inputData()
+    
+    mainPlotFunction(xVar = xvar, yVar = yvar, facetX = facetx, facetY = facety, response = response, data = dat, predictions = predictions)
     
   })
   
