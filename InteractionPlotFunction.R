@@ -38,7 +38,8 @@ interactionPlot <- function(varsInModel,data,error) {
       generateNewVar <- paste("with(data,",varsInModel[i],"*",varsInModel[j],")")
       newVar <- eval(parse(text=generateNewVar))
       interactions[count,1:2] <- c(varsInModel[i],varsInModel[j])
-      interactions[count,3] <- cor(error,newVar,method="spearman")
+      commandComputeR2 <- paste("summary(lm(error~",varsInModel[i],"*",varsInModel[j],",data=data))$r.squared")
+      interactions[count,3] <- eval(parse(text=commandComputeR2))
     }
   }
   
