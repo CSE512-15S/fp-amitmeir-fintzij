@@ -159,6 +159,8 @@ mainEffectPlot <- function(allVariables,varsInModel,response,data,error=NULL) {
     interactionInd <- sapply(varsInModel,function(x) grepl(":",x))
     interactions <- varsInModel[which(interactionInd)]
     main <- varsInModel[which(!interactionInd)]
+  } else {
+    main <- c()
   }
   
   
@@ -181,7 +183,11 @@ mainEffectPlot <- function(allVariables,varsInModel,response,data,error=NULL) {
   }
   
   correlations$roundCor <- round(correlations$correlation,2)
-  inModel <- correlations$variable %in% main
+  if(length(varsInModel)>0) {
+    inModel <- correlations$variable %in% main
+  } else {
+    inModel <- rep(FALSE,length(allVariables))
+  }
 
   mainEffectPlot <- ggplot(correlations) +
     geom_point(data=correlations[inModel,],aes(x=variable,y=correlation),shape=23,fill="black",size=65/length(allVariables)) + 
