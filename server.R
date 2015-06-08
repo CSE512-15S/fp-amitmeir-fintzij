@@ -150,7 +150,7 @@ shinyServer(function(input, output, session) {
   })
   
   fitreactive <- reactive({
-
+    
     fitmod <- model()
     
     fittedmod$fit <- fitmod$fit
@@ -176,7 +176,7 @@ shinyServer(function(input, output, session) {
   
 
   # main effects plot
-  output$mainEffectsPlot <- renderPlot({
+  output$mainEffectsPlot <- renderPlot({    
     
     fitreactive()
     
@@ -326,7 +326,7 @@ shinyServer(function(input, output, session) {
     
     dat <- inputData()
     
-    mainPlotFunction(xVar = xvar, yVar = yvar, facetX = facetx, facetY = facety, response = response, data = dat, predictions = predictions)
+    isolate(mainPlotFunction(xVar = xvar, yVar = yvar, facetX = facetx, facetY = facety, response = response, data = dat, predictions = predictions))
     
   })
   
