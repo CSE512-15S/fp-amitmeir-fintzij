@@ -76,7 +76,7 @@ interactionPlot <- function(varsInModel,data,error) {
   interactionPlot <- interactionPlot + 
     geom_tile(aes(x=var1,y=var2,fill=errorCorrelation,height=0.88,width=0.88)) +
     theme_bw() + 
-    scale_fill_gradient2(limits=c(-1,1),low="blue",midpoint=0, high="red") +
+    scale_fill_gradient2(limits=c(0,1),low="blue", high="red") +
     geom_text(aes(x=var1,y=var2,label=paste(var1,"\n",var2,"\n",errorCorRound2)),size=10/length(varsInModel)) +
     scale_x_discrete(expand=c(0.04,0.04)) + 
     scale_y_discrete(expand=c(0.04,0.04)) + 
@@ -190,7 +190,7 @@ mainEffectPlot <- function(allVariables,varsInModel,response,data,error=NULL) {
     geom_point(aes(x=variable,y=correlation,fill=correlation),shape=23,size=50/length(allVariables)) + 
     theme_bw() + scale_y_continuous(limits=c(-1,1)) + 
     geom_hline(x=0) + 
-    scale_fill_gradient2(low="blue",mid="lightGrey",high="red",limits=c(-1,1))+
+    scale_fill_gradient2(low="blue",high="red",limits=c(0,1))+
     theme(axis.title.x = element_blank(),
           axis.title.y = element_blank(),
           axis.text.x = element_text(angle = -45, vjust = 0.8, hjust = 0.05))
@@ -425,10 +425,16 @@ mainPlotFunction <- function(xVar="",yVar="",facetX="",facetY="",response="",dat
   #tempData$predictions <- rep(NA,nrow(tempData))
   #tempData <- rbind(tempData,predictionFacets)
   
+  #Generating "correctly.classified"
+#   classifyTrue <- predictions > 0.5
+#   responseVals <- paste("data$",response)
+#   responseVals <- eval(parse(text=(responseVals)))
+#   tempData$classification.error <- !((classifyTrue & (response>0.5)) | (!classifyTrue & (response<0.5)))
+ 
   #Plotting
   commandPlot <- paste("ggplot()")
   commandPlot <- paste(commandPlot,"+ geom_tile(data=predictionFacets,aes(x=",xVar,",y=",yVar,",fill=predictions),alpha=0.3)")
-  commandPlot <- paste(commandPlot,"+ geom_point(data=tempData,aes(x=,",xVar,",y=",yVar,",color=",response,"))")
+  commandPlot <- paste(commandPlot,"+ geom_point(data=tempData,aes(x=,",xVar,",y=",yVar,",color=",response,",shape=classification.error))")
   commandPlot <- paste(commandPlot,"+ facet_grid(",facetX,"~",facetY,",labeller='label_both')")
   commandPlot <- paste(commandPlot,"+ scale_fill_gradient2(midpoint=0.5,mid='white',high='blue',low='red')")
   commandPlot <- paste(commandPlot,"+ scale_color_manual(values=c('red3','navy'))")
