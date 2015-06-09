@@ -51,8 +51,9 @@ shinyServer(function(input, output, session) {
     
     tosummarize <- input$tosummarize
     
-    cat(ifelse(is.null(tosummarize), "No variables chosen. Select variables to display summary statistics.", summary(dataset[match(tosummarize, names(dataset))])))
-    
+    if(is.null(tosummarize)){
+      cat("No variables chosen. Select variables to display summary statistics.")
+    } else(summary(dataset[match(tosummarize, names(dataset))]))
   })
   
   output$tosummarize <- renderUI({
