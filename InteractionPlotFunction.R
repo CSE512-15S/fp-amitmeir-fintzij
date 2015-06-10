@@ -43,7 +43,7 @@ interactionPlot <- function(varsInModel,data,error) {
     }
   }
   
-  interactions[,3] <- runif(min=0,max=1,nrow(interactions))
+  #interactions[,3] <- runif(min=0,max=1,nrow(interactions))
   
   interactions$roundCor <- round(interactions$errorCorrelation,2)
   interactions$errorCorRound2 <- round(interactions$errorCorrelation,2)
