@@ -43,7 +43,7 @@ interactionPlot <- function(varsInModel,data,error) {
     }
   }
   
-  #interactions[,3] <- runif(min=-1,max=1,nrow(interactions))
+  interactions[,3] <- runif(min=0,max=1,nrow(interactions))
   
   interactions$roundCor <- round(interactions$errorCorrelation,2)
   interactions$errorCorRound2 <- round(interactions$errorCorrelation,2)
@@ -426,10 +426,10 @@ mainPlotFunction <- function(xVar="",yVar="",facetX="",facetY="",response="",dat
   #tempData <- rbind(tempData,predictionFacets)
   
   #Generating "correctly.classified"
-#   classifyTrue <- predictions > 0.5
-#   responseVals <- paste("data$",response)
-#   responseVals <- eval(parse(text=(responseVals)))
-#   tempData$classification.error <- !((classifyTrue & (response>0.5)) | (!classifyTrue & (response<0.5)))
+  classifyTrue <- predictions > 0.5
+  responseVals <- paste("data$",response)
+  responseVals <- eval(parse(text=(responseVals)))
+  tempData$classification.error <- !((classifyTrue & (response>0.5)) | (!classifyTrue & (response<0.5)))
  
   #Plotting
   commandPlot <- paste("ggplot()")
